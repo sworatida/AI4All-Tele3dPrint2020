@@ -14,7 +14,6 @@ import sys
 import time
 from PyQt5 import QtWidgets, QtCore
 
-# sever 1243
 
 
 class WorkerThread(QtCore.QObject):
