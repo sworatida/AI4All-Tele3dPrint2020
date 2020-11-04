@@ -2,12 +2,15 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>793</width>
-    <height>594</height>
+    <width>797</width>
+    <height>592</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -324,7 +327,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QLabel" name="label_4">
              <property name="text">
-              <string>aaaaaaaaaa</string>
+              <string/>
              </property>
             </widget>
            </item>
@@ -366,47 +369,12 @@ p, li { white-space: pre-wrap; }
           </layout>
          </widget>
         </widget>
-        <widget class="QGroupBox" name="groupBox_9">
-         <property name="geometry">
-          <rect>
-           <x>480</x>
-           <y>150</y>
-           <width>91</width>
-           <height>41</height>
-          </rect>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="title">
-          <string>Printer Jop</string>
-         </property>
-         <widget class="QWidget" name="horizontalLayoutWidget_8">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>20</y>
-            <width>71</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_8">
-           <item>
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>TextLabel</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </widget>
         <widget class="QGroupBox" name="groupBox_10">
          <property name="geometry">
           <rect>
            <x>580</x>
            <y>150</y>
-           <width>120</width>
+           <width>151</width>
            <height>41</height>
           </rect>
          </property>
@@ -419,9 +387,9 @@ p, li { white-space: pre-wrap; }
          <widget class="QWidget" name="horizontalLayoutWidget_9">
           <property name="geometry">
            <rect>
-            <x>9</x>
+            <x>10</x>
             <y>20</y>
-            <width>101</width>
+            <width>131</width>
             <height>21</height>
            </rect>
           </property>
@@ -429,7 +397,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QLabel" name="label_8">
              <property name="text">
-              <string>TextLabel</string>
+              <string/>
              </property>
             </widget>
            </item>
@@ -441,7 +409,7 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>270</x>
            <y>150</y>
-           <width>71</width>
+           <width>141</width>
            <height>41</height>
           </rect>
          </property>
@@ -456,7 +424,7 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>10</x>
             <y>20</y>
-            <width>51</width>
+            <width>121</width>
             <height>21</height>
            </rect>
           </property>
@@ -474,9 +442,9 @@ p, li { white-space: pre-wrap; }
         <widget class="QGroupBox" name="groupBox_8">
          <property name="geometry">
           <rect>
-           <x>350</x>
+           <x>419</x>
            <y>150</y>
-           <width>120</width>
+           <width>151</width>
            <height>41</height>
           </rect>
          </property>
@@ -491,7 +459,7 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>9</x>
             <y>20</y>
-            <width>101</width>
+            <width>131</width>
             <height>21</height>
            </rect>
           </property>
@@ -499,7 +467,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QLabel" name="label_6">
              <property name="text">
-              <string>aaaaaaaaaa</string>
+              <string/>
              </property>
             </widget>
            </item>
@@ -601,16 +569,38 @@ p, li { white-space: pre-wrap; }
         <attribute name="title">
          <string>Contact Us</string>
         </attribute>
-        <widget class="QWidget" name="horizontalLayoutWidget_12">
+        <widget class="QLabel" name="label_2">
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>40</x>
            <y>10</y>
-           <width>721</width>
-           <height>451</height>
+           <width>684</width>
+           <height>501</height>
           </rect>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_12"/>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>Teleoperation Control System for Learning of 3D Prototype Printing
+
+Institute of FIeld roBOtics (FIBO)
+
+King Mongkut's University of Technology Thonburi (KMUTT). Bangkok, Thailand
+
+ 
+E-mail: Tele3DPrinting@gmail.com</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
         </widget>
        </widget>
       </widget>
@@ -623,7 +613,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>793</width>
+     <width>797</width>
      <height>26</height>
     </rect>
    </property>

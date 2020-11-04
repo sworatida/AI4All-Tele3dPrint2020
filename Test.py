@@ -29,10 +29,11 @@ class WorkerThread(QtCore.QObject):
         while True:
             # Long running task ...
             # self.signalExample.emit("leet", 1337)
-
+            
             self.msg = self.s.recv(1024)
             # .decode("utf-8") # รับค่า
             print(f"---{self.msg}---")
+            self.func(99,'white','TRUE')
             # if self.msg == b'\x00':
             #     self.func(12, 'red', 'Waiting')
             # elif self.msg == b'Initialization':
@@ -53,7 +54,7 @@ class WorkerThread(QtCore.QObject):
                 pass
             else:
                 self.func(7, 'lightgreen', 'Temp is '+str(ord(self.msg)))
-
+        self.func(98,'white','FALSE')
 
 # class Server(QtCore.QObject):
 #     def __init__(self):
@@ -184,6 +185,11 @@ class Ui(QMainWindow):
         self.status12.setText("Waiting...")
         self.status12.setToolTip('This is a tooltip message.')
 
+        self.backEndWorker = self.findChild(QLabel,'label_3')
+        self.backEndState = self.findChild(QLabel,'label_4')
+        self.fileState = self.findChild(QLabel,'label_5')
+        self.printerStatus = self.findChild(QLabel,'label_6')
+        self.fileName = self.findChild(QLabel,'label_8')
 
         self.show()
 
@@ -215,21 +221,28 @@ class Ui(QMainWindow):
         if status_number == 2:
             self.status2.setStyleSheet("background-color: " + color)
             self.status2.setText(text)
+            self.printerStatus.setText(text)
         elif status_number == 3:
             self.status3.setStyleSheet("background-color: " + color)
             self.status3.setText(text)
+            self.printerStatus.setText(text)
         elif status_number == 4:
             self.status4.setStyleSheet("background-color: " + color)
             self.status4.setText(text)
+            self.printerStatus.setText(text)
         elif status_number == 5:
             self.status5.setStyleSheet("background-color: " + color)
             self.status5.setText(text)
+            self.printerStatus.setText(text)
         elif status_number == 6:
             self.status6.setStyleSheet("background-color: " + color)
             self.status6.setText(text)
+            self.printerStatus.setText(text)
         elif status_number == 7:
             self.status7.setStyleSheet("background-color: " + color)
             self.status7.setText(text)
+        elif status_number == 99:
+            self.backEndWorker.setText(text)
 
     def openProgramXYZ(self):
         # subprocess.call(["C:\\Program Files\\XYZprint\\XYZprint.exe"])
@@ -243,12 +256,16 @@ class Ui(QMainWindow):
 
         try:
             if not os.path.exists(directory_path):  # Check is path alive?
+                self.backEndState.setText('Check is path alive?')
                 os.makedirs(directory_path)  # Create folder
+                self.backEndState.setText('Create folder')
         except OSError:
             print('Error: Creating directory. ' + directory_path)
+            self.backEndState.setText('Error: Creating directory.')
 
         # response = requests.get('http://tele3dprinting.com/2019/process.php?api=list')
         response = requests.get(self.serverAddressList.text())
+        self.logTextEdit.append(response)
         if response.content == b'<ol></ol>':  # If don't have file to download
             return
 
@@ -259,11 +276,14 @@ class Ui(QMainWindow):
 
         file_id = splited_text[0]
         file_name = splited_text[1]  # .split(' ')[-1]
+        self.fileName.setText(file_name)
 
         # download_url = 'http://tele3dprinting.com/2019/process.php?api=stl.read&file_id=' + file_id
         download_url = self.serverAddressID.text() + file_id
+        self.logTextEdit.append(download_url)
         r = requests.get(download_url, allow_redirects=True)
         save_path = directory_path+'/'+file_name
+        self.logTextEdit.append(save_path)
         with open(save_path, 'wb') as file:
             file.write(r.content)
 
@@ -278,7 +298,8 @@ class Ui(QMainWindow):
     def emulateFunction(self, state_click_image_url):
         found_location = None
         while found_location == None:
-            found_location = pyautogui.locateOnScreen(state_click_image_url, confidence=.9)
+            # found_location = pyautogui.locateOnScreen(state_click_image_url, confidence= .8)
+            found_location = pyautogui.locateOnScreen(state_click_image_url)
 
             if found_location:
                 buttonx, buttony = pyautogui.center(found_location)
@@ -290,6 +311,7 @@ class Ui(QMainWindow):
         self.emulateFunction('ImageRecognition/3-Open-file.PNG')
         pyautogui.write(file_path)
         pyautogui.press('enter')
+        self.fileState.setText('Import to XYZ.')
 
         self.worker.s.send(b'\x02')
         time.sleep(3)
@@ -317,9 +339,9 @@ class Ui(QMainWindow):
         # This is executed when the button is pressed
         # print('printButtonPressed')
         self.logTextEdit.append("START")
-        self.worker.s.send(b'\x00') # ส่งค่า 0 กลับไปที่ Server
+        # self.worker.s.send(b'\x00') # ส่งค่า 0 กลับไปที่ Server
+        self.worker.s.send('0')
         # self.startSocketServer()
-
 
         ready_status = self.status2.text()
         print(f"ready_status={ready_status}")
@@ -358,11 +380,13 @@ class Ui(QMainWindow):
 
     def stopButtonPressed(self):
         # This is executed when the button is pressed
-        self.worker.s.send(b'\x01')
+        # self.worker.s.send(b'\x01')
+        self.logTextEdit.append("STOP")
         print('STOP')
 
     def resetButtonPressed(self):
         # This is executed when the button is pressed
+        self.logTextEdit.append("RESET")
         print('RESET')
 
 
