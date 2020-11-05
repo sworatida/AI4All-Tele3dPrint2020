@@ -20,7 +20,9 @@ class WorkerThread(QtCore.QObject):
     def __init__(self, func):
         super().__init__()
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect((socket.gethostname(), 1242))
+        # self.s.connect((socket.gethostname(), 1242))
+        self.s.connect(("127.0.0.1", 1242))
+        # self.s.sendall(b"Hello")
         self.msg = ''
         self.func = func
 
@@ -33,7 +35,7 @@ class WorkerThread(QtCore.QObject):
             self.msg = self.s.recv(1024)
             # .decode("utf-8") # รับค่า
             print(f"---{self.msg}---")
-            self.func(99,'white','TRUE')
+            # self.func(99,'white','TRUE')          
             # if self.msg == b'\x00':
             #     self.func(12, 'red', 'Waiting')
             # elif self.msg == b'Initialization':
@@ -52,9 +54,10 @@ class WorkerThread(QtCore.QObject):
                 self.func(6, 'lightgreen', 'Object On Heat Bed')
             elif self.msg == b'\x00':
                 pass
-            else:
-                self.func(7, 'lightgreen', 'Temp is '+str(ord(self.msg)))
-        self.func(98,'white','FALSE')
+            # else:
+            #     self.func(7, 'lightgreen', 'Temp is '+str(ord(self.msg)))
+            # self.worker.s.send("Hello")
+        # self.func(98,'white','FALSE')
 
 # class Server(QtCore.QObject):
 #     def __init__(self):
@@ -81,6 +84,46 @@ class WorkerThread(QtCore.QObject):
 #         #         data = self.conn.recv(1024)
 #         #         # if not data:
 #         #         #     break
+
+# class Server(QtCore.QObject):
+#     def __init__(self):
+#         super().__init__()
+#         # HOST = socket.gethostname()  # Standard loopback interface address (localhost)
+#         # Port to listen on (non-privileged ports are > 1023)
+#         PORT = 1243
+
+#         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#         self.s.bind(('127.0.0.1', PORT))
+#         self.s.listen()
+#         # self.conn, addr = self.s.accept()
+    
+#     @QtCore.pyqtSlot()
+#     def run(self):
+#         i = 0
+#         print("AAAA")
+#         while True:
+            
+#             print("CCC-----C")
+#             if i == 0:
+#                 (clientConnected, clientAddress) = self.s.accept()
+#                 print("Accepted a connection request from %s:%s" %
+#                     (clientAddress[0], clientAddress[1]))
+#                 i = 1
+#                 print("BBBB")
+
+#             print("CCCC")
+#             clientConnected.send("Hello Client!".encode())
+#             print("DDDD")
+
+#         # with self.conn:
+#         #     print('Connected by', addr)
+#         #     while True:
+#         #         time.sleep(0.7)
+#         #         self.conn.sendall(x)
+#         #         data = self.conn.recv(1024)
+#         #         # if not data:
+#         #         #     break
+
 
 
 class Ui(QMainWindow):
@@ -265,7 +308,7 @@ class Ui(QMainWindow):
 
         # response = requests.get('http://tele3dprinting.com/2019/process.php?api=list')
         response = requests.get(self.serverAddressList.text())
-        self.logTextEdit.append(response)
+        # self.logTextEdit.append(response)
         if response.content == b'<ol></ol>':  # If don't have file to download
             return
 
@@ -306,6 +349,7 @@ class Ui(QMainWindow):
                 pyautogui.click(buttonx, buttony)
 
     def mouseEmulation(self, file_path):
+        time.sleep(15)
         self.emulateFunction('ImageRecognition/1-Close-Login.PNG')
         self.emulateFunction('ImageRecognition/2-Import-file.PNG')
         self.emulateFunction('ImageRecognition/3-Open-file.PNG')
@@ -313,9 +357,8 @@ class Ui(QMainWindow):
         pyautogui.press('enter')
         self.fileState.setText('Import to XYZ.')
 
-        self.worker.s.send(b'\x02')
-        time.sleep(3)
-
+        self.worker.s.sendall(b'st:0:st')
+        # time.sleep(10)
         self.emulateFunction('ImageRecognition/5-Print.PNG')
 
     # def startSocketServer(self):
@@ -337,10 +380,11 @@ class Ui(QMainWindow):
 
     def startButtonPressed(self):
         # This is executed when the button is pressed
-        # print('printButtonPressed')
+        print('-----------printButtonPressed------------')
         self.logTextEdit.append("START")
+        self.worker.s.sendall(b"st:0:st")
         # self.worker.s.send(b'\x00') # ส่งค่า 0 กลับไปที่ Server
-        self.worker.s.send('0')
+        #self.worker.s.send('0')
         # self.startSocketServer()
 
         ready_status = self.status2.text()
@@ -382,6 +426,7 @@ class Ui(QMainWindow):
         # This is executed when the button is pressed
         # self.worker.s.send(b'\x01')
         self.logTextEdit.append("STOP")
+        self.worker.s.sendall(b'st:2:st')
         print('STOP')
 
     def resetButtonPressed(self):

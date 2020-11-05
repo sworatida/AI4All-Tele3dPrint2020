@@ -2,7 +2,7 @@ import time
 import socket
 
 HOST = socket.gethostname()  # Standard loopback interface address (localhost)
-PORT = 1242        # Port to listen on (non-privileged ports are > 1023)
+PORT = 1243        # Port to listen on (non-privileged ports are > 1023)
 
 i = 0
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
