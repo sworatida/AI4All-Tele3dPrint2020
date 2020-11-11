@@ -12,12 +12,13 @@ import socket
 
 import sys
 import time
+import json
 from PyQt5 import QtWidgets, QtCore
 
 
 
 class WorkerThread(QtCore.QObject):
-    def __init__(self, func):
+    def __init__(self, func, school_id, start_function, download_handler):
         super().__init__()
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.s.connect((socket.gethostname(), 1242))
@@ -25,6 +26,15 @@ class WorkerThread(QtCore.QObject):
         # self.s.sendall(b"Hello")
         self.msg = ''
         self.func = func
+
+        self.school_id = school_id
+        self.is_fetch = True
+        self.startFunction = start_function
+        self.download3DModel = download_handler
+        self.last_time = time.time()
+
+    def setFetchStatus(self, status):
+        self.is_fetch = status
 
     @QtCore.pyqtSlot()
     def run(self):
@@ -54,82 +64,55 @@ class WorkerThread(QtCore.QObject):
                 self.func(6, 'lightgreen', 'Object On Heat Bed')
             elif self.msg == b'\x00':
                 pass
-            # else:
-            #     self.func(7, 'lightgreen', 'Temp is '+str(ord(self.msg)))
-            # self.worker.s.send("Hello")
-        # self.func(98,'white','FALSE')
 
-# class Server(QtCore.QObject):
-#     def __init__(self):
-#         super().__init__()
-#         HOST = socket.gethostname()  # Standard loopback interface address (localhost)
-#         # Port to listen on (non-privileged ports are > 1023)
-#         PORT = 1243
-
-#         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#         self.s.bind((HOST, PORT))
-#         self.s.listen()
-#         self.conn, addr = self.s.accept()
-
-#     @QtCore.pyqtSlot()
-#     def run(self):
-#         while True:
-#             pass
-
-#         # with self.conn:
-#         #     print('Connected by', addr)
-#         #     while True:
-#         #         time.sleep(0.7)
-#         #         self.conn.sendall(x)
-#         #         data = self.conn.recv(1024)
-#         #         # if not data:
-#         #         #     break
-
-# class Server(QtCore.QObject):
-#     def __init__(self):
-#         super().__init__()
-#         # HOST = socket.gethostname()  # Standard loopback interface address (localhost)
-#         # Port to listen on (non-privileged ports are > 1023)
-#         PORT = 1243
-
-#         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#         self.s.bind(('127.0.0.1', PORT))
-#         self.s.listen()
-#         # self.conn, addr = self.s.accept()
-    
-#     @QtCore.pyqtSlot()
-#     def run(self):
-#         i = 0
-#         print("AAAA")
-#         while True:
+            time_pass = time.time() - self.last_time
             
-#             print("CCC-----C")
-#             if i == 0:
-#                 (clientConnected, clientAddress) = self.s.accept()
-#                 print("Accepted a connection request from %s:%s" %
-#                     (clientAddress[0], clientAddress[1]))
-#                 i = 1
-#                 print("BBBB")
+            if self.is_fetch and self.msg == b'Ready' and time_pass > 3:
+                print("Fetching")
 
-#             print("CCCC")
-#             clientConnected.send("Hello Client!".encode())
-#             print("DDDD")
+                response = requests.get('http://tele3dprinting.com/2019/process.php?api=list')
+                # response = requests.get(self.serverAddressList.text())
+                # response = response.json()
 
-#         # with self.conn:
-#         #     print('Connected by', addr)
-#         #     while True:
-#         #         time.sleep(0.7)
-#         #         self.conn.sendall(x)
-#         #         data = self.conn.recv(1024)
-#         #         # if not data:
-#         #         #     break
+                response = [
+                    {
+                        "school_id": "1",
+                        "user_id": "144",
+                        "file_id": "236",
+                        "file": "FIBO Tag.3w",
+                        "file_download": "2020-11-06 11-04-40 (144) (FIBO Tag.3w).0.3w"
+                    },
+                    {
+                        "school_id": "13",
+                        "user_id": "2",
+                        "file_id": "235",
+                        "file": "FishSupportBase.3w",
+                        "file_download": "2020-11-03 16-41-03 (2) (FishSupportBase.3w).0.3w"
+                    }
+                ]
 
+                self.last_time = time.time()
+
+                for obj in response:
+                    if obj['school_id'] == self.school_id.text():
+                        self.is_fetch = False
+
+                        # Don't forget to reset self.is_fetch state !!! When print finish !!
+                        save_path = self.download3DModel(file_id=obj['file_id'], file_name=obj['file'])
+                        self.startFunction(is_worker_handle=True, save_path=save_path)
+                pass
 
 
 class Ui(QMainWindow):
 
     def __init__(self):
         super(Ui, self).__init__()
+
+
+        with open('CONFIG.json', 'r') as file:
+            self.DEFAULT_CONFIG = json.load(file)
+
+
         uic.loadUi('ProgramSetXYZ.ui', self)
 
         self.setWindowTitle("Tele3DPrint - FIBO - KMUTT")
@@ -167,6 +150,9 @@ class Ui(QMainWindow):
 
         # self.messages.append(f'Running Program..')
         # self.logTextEdit.setText("\n".join(self.messages))
+
+        self.sc_id = self.findChild(QLineEdit, 'lineEdit_2')
+        self.sc_id.setText(self.DEFAULT_CONFIG['SCHOOL_ID'])
 
         self.status1 = self.findChild(QLabel, 'label_12')  # download3DModel
         self.status1.setStyleSheet("background-color: white")
@@ -237,7 +223,7 @@ class Ui(QMainWindow):
         self.show()
 
         ''' ---------------------- Thread ----------------------- '''
-        self.worker = WorkerThread(self.testUpdateUI)
+        self.worker = WorkerThread(self.testUpdateUI, self.sc_id, self.startButtonPressed, self.download3DModel)
         self.workerThread = QtCore.QThread()
         # Init worker run() at startup (optional)
         self.workerThread.started.connect(self.worker.run)
@@ -246,19 +232,8 @@ class Ui(QMainWindow):
         self.worker.moveToThread(self.workerThread)
         self.workerThread.start()
 
-        ''' ---------------------- Server ----------------------- '''
-        # self.worker_server = Server()
-        # self.workerThread_2 = QtCore.QThread()
-        # # Init worker run() at startup (optional)
-        # self.workerThread_2.started.connect(self.worker_server.run)
-        # # self.worker.signalExample.connect(self.signalExample)  # Connect your signals/slots
-        # # Move the Worker object to the Thread object
-        # self.worker_server.moveToThread(self.workerThread_2)
-        # self.workerThread_2.start()
 
     def testUpdateUI(self, status_number, color, text):
-        # self.status12.setStyleSheet("background-color: lightgreen")
-        # self.status12.setText("Waiting...")
         text = str(text)
         print(status_number, color, text)
         if status_number == 2:
@@ -291,7 +266,7 @@ class Ui(QMainWindow):
         # subprocess.call(["C:\\Program Files\\XYZprint\\XYZprint.exe"])
         os.startfile("C:\\Program Files\\XYZprint\\XYZprint.exe")
 
-    def download3DModel(self):  # .3w
+    def download3DModel(self, file_id, file_name):  # .3w
         print("Downloading 3D Model")
 
         desktop_path = os.path.expanduser("~/Desktop")  # Find desktop path
@@ -306,19 +281,7 @@ class Ui(QMainWindow):
             print('Error: Creating directory. ' + directory_path)
             self.backEndState.setText('Error: Creating directory.')
 
-        # response = requests.get('http://tele3dprinting.com/2019/process.php?api=list')
-        response = requests.get(self.serverAddressList.text())
-        # self.logTextEdit.append(response)
-        if response.content == b'<ol></ol>':  # If don't have file to download
-            return
 
-        soup = BeautifulSoup(response.content)
-        data = soup.find_all('a')
-
-        splited_text = data[0].text.split('#')
-
-        file_id = splited_text[0]
-        file_name = splited_text[1]  # .split(' ')[-1]
         self.fileName.setText(file_name)
 
         # download_url = 'http://tele3dprinting.com/2019/process.php?api=stl.read&file_id=' + file_id
@@ -361,36 +324,18 @@ class Ui(QMainWindow):
         # time.sleep(10)
         self.emulateFunction('ImageRecognition/5-Print.PNG')
 
-    # def startSocketServer(self):
-    #     HOST = socket.gethostname()  # Standard loopback interface address (localhost)
-    #     PORT = 1243        # Port to listen on (non-privileged ports are > 1023)
 
-    #     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    #         s.bind((HOST, PORT))
-    #         s.listen()
-    #         conn, addr = s.accept()
-    #         with conn:
-    #             print('Connected by', addr)
-    #             # while True:
-    #                 # conn.sendall(b'0')
-    #             conn.sendall(b'\x00')
-    #             # data = conn.recv(1024)
-    #             # if not data:
-    #             #     break
-
-    def startButtonPressed(self):
+    def startButtonPressed(self, is_worker_handle=False, save_path=''):
         # This is executed when the button is pressed
         print('-----------printButtonPressed------------')
         self.logTextEdit.append("START")
         self.worker.s.sendall(b"st:0:st")
-        # self.worker.s.send(b'\x00') # ส่งค่า 0 กลับไปที่ Server
-        #self.worker.s.send('0')
-        # self.startSocketServer()
 
         ready_status = self.status2.text()
         print(f"ready_status={ready_status}")
         if ready_status == "Printer Ready":
-            save_path = self.download3DModel()
+            if is_worker_handle:
+                save_path = save_path
             print(f"save_path = {save_path}")
             # save_path = '"C:\\Users\\Lookpeach\\Desktop\\3DTeleprint\\2020-10-14 16-09-58 (2) (Cube_test.stl).0.stl"'
             if save_path == None:
@@ -417,7 +362,6 @@ class Ui(QMainWindow):
                       self.serverAddressList.text())
                 print('Server Address ID Model is:' +
                       self.serverAddressID.text())
-                save_path = self.download3DModel()
                 self.mouseEmulation(save_path)
         else:
             pass
