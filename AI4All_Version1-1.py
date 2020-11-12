@@ -298,9 +298,6 @@ class Ui(QMainWindow):
         return os.path.join(os.path.expandvars("%userprofile%"), "Desktop", "3DTeleprint", file_name)
         # C:\Users\Lookpeach\Desktop\3DTeleprint\2020-10-14 16-09-58 (2) (Cube_test.stl).0.stl
 
-        # self.updateGL()
-        # time.sleep(3)
-
     def emulateFunction(self, state_click_image_url):
         found_location = None
         while found_location == None:
@@ -316,7 +313,11 @@ class Ui(QMainWindow):
         self.emulateFunction('ImageRecognition/1-Close-Login.PNG')
         self.emulateFunction('ImageRecognition/2-Import-file.PNG')
         self.emulateFunction('ImageRecognition/3-Open-file.PNG')
-        pyautogui.write(file_path)
+        print(f"---> File Path : {file_path}")
+        # time.sleep(2)
+        # pyautogui.write(file_path)
+        pyautogui.typewrite(file_path)
+        time.sleep(2)
         pyautogui.press('enter')
         self.fileState.setText('Import to XYZ.')
 
