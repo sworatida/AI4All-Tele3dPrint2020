@@ -60,6 +60,8 @@ class WorkerThread(QtCore.QObject):
                 self.func(2, 'lightgreen', 'Printer Ready')
             elif self.msg == b'Pre-heat Extruder':
                 self.func(3, 'lightgreen', 'Pre-heat Extrude')
+                self.closeProgramXYZ()
+                self.setFetchStatus(status=True)
             elif self.msg == b'Printing':
                 self.func(4, 'lightgreen', 'Printing')
             elif self.msg == b'Store Extruder':
@@ -106,8 +108,8 @@ class WorkerThread(QtCore.QObject):
                         self.startFunction(is_worker_handle=True, save_path=save_path)
                 pass
 
-            if self.msg == b'Pre-heat Extruder':
-                self.closeProgramXYZ()
+            # if self.msg == b'Pre-heat Extruder':
+            #     self.closeProgramXYZ()
 
 
 class Ui(QMainWindow):
@@ -162,64 +164,19 @@ class Ui(QMainWindow):
         self.sc_id.setText(self.DEFAULT_CONFIG['SCHOOL_ID'])
 
         self.status1 = self.findChild(QLabel, 'label_12')  # download3DModel
-        self.status1.setStyleSheet("background-color: white")
-        self.status1.setText("Waiting...")
-        self.status1.setToolTip('This is a tooltip message.')
-
         self.status2 = self.findChild(QLabel, 'label_13')  # เปิดโปรแกรม
-        self.status2.setStyleSheet("background-color: white")
-        self.status2.setText("Waiting...")
-        self.status2.setToolTip('This is a tooltip message.')
-
         self.status3 = self.findChild(QLabel, 'label_14')
-        self.status3.setStyleSheet("background-color: white")
-        self.status3.setText("Waiting...")
-        self.status3.setToolTip('This is a tooltip message.')
-
         self.status4 = self.findChild(QLabel, 'label_15')
-        self.status4.setStyleSheet("background-color: white")
-        self.status4.setText("Waiting...")
-        self.status4.setToolTip('This is a tooltip message.')
-
         self.status5 = self.findChild(QLabel, 'label_16')
-        self.status5.setStyleSheet("background-color: white")
-        self.status5.setText("Waiting...")
-        self.status5.setToolTip('This is a tooltip message.')
-
         self.status6 = self.findChild(QLabel, 'label_17')
-        self.status6.setStyleSheet("background-color: white")
-        self.status6.setText("Waiting...")
-        self.status6.setToolTip('This is a tooltip message.')
-
         self.status7 = self.findChild(QLabel, 'label_18')
-        self.status7.setStyleSheet("background-color: white")
-        self.status7.setText("Waiting...")
-        self.status7.setToolTip('This is a tooltip message.')
-
         self.status8 = self.findChild(QLabel, 'label_19')
-        self.status8.setStyleSheet("background-color: white")
-        self.status8.setText("Waiting...")
-        self.status8.setToolTip('This is a tooltip message.')
-
         self.status9 = self.findChild(QLabel, 'label_20')
-        self.status9.setStyleSheet("background-color: white")
-        self.status9.setText("Waiting...")
-        self.status9.setToolTip('This is a tooltip message.')
-
         self.status10 = self.findChild(QLabel, 'label_21')
-        self.status10.setStyleSheet("background-color: white")
-        self.status10.setText("Waiting...")
-        self.status10.setToolTip('This is a tooltip message.')
-
         self.status11 = self.findChild(QLabel, 'label_22')
-        self.status11.setStyleSheet("background-color: white")
-        self.status11.setText("Waiting...")
-        self.status11.setToolTip('This is a tooltip message.')
-
         self.status12 = self.findChild(QLabel, 'label_23')
-        self.status12.setStyleSheet("background-color: white")
-        self.status12.setText("Waiting...")
-        self.status12.setToolTip('This is a tooltip message.')
+
+        self.resetUiState()
 
         self.backEndWorker = self.findChild(QLabel,'label_3')
         self.backEndState = self.findChild(QLabel,'label_4')
@@ -238,6 +195,55 @@ class Ui(QMainWindow):
         # Move the Worker object to the Thread object
         self.worker.moveToThread(self.workerThread)
         self.workerThread.start()
+
+    def resetUiState(self):
+        self.status1.setStyleSheet("background-color: white")
+        self.status1.setText("Waiting...")
+        self.status1.setToolTip('This is a tooltip message.')
+
+        self.status2.setStyleSheet("background-color: white")
+        self.status2.setText("Waiting...")
+        self.status2.setToolTip('This is a tooltip message.')
+
+        self.status3.setStyleSheet("background-color: white")
+        self.status3.setText("Waiting...")
+        self.status3.setToolTip('This is a tooltip message.')
+
+        self.status4.setStyleSheet("background-color: white")
+        self.status4.setText("Waiting...")
+        self.status4.setToolTip('This is a tooltip message.')
+
+        self.status5.setStyleSheet("background-color: white")
+        self.status5.setText("Waiting...")
+        self.status5.setToolTip('This is a tooltip message.')
+
+        self.status6.setStyleSheet("background-color: white")
+        self.status6.setText("Waiting...")
+        self.status6.setToolTip('This is a tooltip message.')
+
+        self.status7.setStyleSheet("background-color: white")
+        self.status7.setText("Waiting...")
+        self.status7.setToolTip('This is a tooltip message.')
+
+        self.status8.setStyleSheet("background-color: white")
+        self.status8.setText("Waiting...")
+        self.status8.setToolTip('This is a tooltip message.')
+
+        self.status9.setStyleSheet("background-color: white")
+        self.status9.setText("Waiting...")
+        self.status9.setToolTip('This is a tooltip message.')
+
+        self.status10.setStyleSheet("background-color: white")
+        self.status10.setText("Waiting...")
+        self.status10.setToolTip('This is a tooltip message.')
+
+        self.status11.setStyleSheet("background-color: white")
+        self.status11.setText("Waiting...")
+        self.status11.setToolTip('This is a tooltip message.')
+
+        self.status12.setStyleSheet("background-color: white")
+        self.status12.setText("Waiting...")
+        self.status12.setToolTip('This is a tooltip message.')
 
 
     def testUpdateUI(self, status_number, color, text):
@@ -272,6 +278,7 @@ class Ui(QMainWindow):
     def closeProgramXYZ(self):
         # if "XYZPrint.exe" in (p.name() for p in psutil.process_iter()):
         os.system("TASKKILL /F /IM XYZPrint.exe")
+        self.resetUiState()
 
     def openProgramXYZ(self):
         # subprocess.call(["C:\\Program Files\\XYZprint\\XYZprint.exe"])
