@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QLineEdit, QPushButton, QMainWindow, QLabel, QApplic
 import sys
 # import subprocess
 import os
+import psutil
 import time
 import pyautogui
 import requests
@@ -15,10 +16,12 @@ import time
 import json
 from PyQt5 import QtWidgets, QtCore
 
+import pywinauto.keyboard as keyboard
+
 
 
 class WorkerThread(QtCore.QObject):
-    def __init__(self, func, school_id, start_function, download_handler):
+    def __init__(self, func, school_id, start_function, download_handler, close_ProgramXYZ):
         super().__init__()
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.s.connect((socket.gethostname(), 1242))
@@ -31,6 +34,7 @@ class WorkerThread(QtCore.QObject):
         self.is_fetch = True
         self.startFunction = start_function
         self.download3DModel = download_handler
+        self.closeProgramXYZ = close_ProgramXYZ
         self.last_time = time.time()
 
     def setFetchStatus(self, status):
@@ -72,24 +76,24 @@ class WorkerThread(QtCore.QObject):
 
                 response = requests.get('http://tele3dprinting.com/2019/process.php?api=list')
                 # response = requests.get(self.serverAddressList.text())
-                # response = response.json()
+                response = response.json()
 
-                response = [
-                    {
-                        "school_id": "1",
-                        "user_id": "144",
-                        "file_id": "236",
-                        "file": "FIBO Tag.3w",
-                        "file_download": "2020-11-06 11-04-40 (144) (FIBO Tag.3w).0.3w"
-                    },
-                    {
-                        "school_id": "13",
-                        "user_id": "2",
-                        "file_id": "235",
-                        "file": "FishSupportBase.3w",
-                        "file_download": "2020-11-03 16-41-03 (2) (FishSupportBase.3w).0.3w"
-                    }
-                ]
+                # response = [
+                #     {
+                #         "school_id": "1",
+                #         "user_id": "144",
+                #         "file_id": "236",
+                #         "file": "FIBO Tag.3w",
+                #         "file_download": "2020-11-06 11-04-40 (144) (FIBO Tag.3w).0.3w"
+                #     },
+                #     {
+                #         "school_id": "13",
+                #         "user_id": "2",
+                #         "file_id": "235",
+                #         "file": "FishSupportBase.3w",
+                #         "file_download": "2020-11-03 16-41-03 (2) (FishSupportBase.3w).0.3w"
+                #     }
+                # ]
 
                 self.last_time = time.time()
 
@@ -101,6 +105,9 @@ class WorkerThread(QtCore.QObject):
                         save_path = self.download3DModel(file_id=obj['file_id'], file_name=obj['file'])
                         self.startFunction(is_worker_handle=True, save_path=save_path)
                 pass
+
+            if self.msg == b'Pre-heat Extruder':
+                self.closeProgramXYZ()
 
 
 class Ui(QMainWindow):
@@ -223,7 +230,7 @@ class Ui(QMainWindow):
         self.show()
 
         ''' ---------------------- Thread ----------------------- '''
-        self.worker = WorkerThread(self.testUpdateUI, self.sc_id, self.startButtonPressed, self.download3DModel)
+        self.worker = WorkerThread(self.testUpdateUI, self.sc_id, self.startButtonPressed, self.download3DModel, self.closeProgramXYZ)
         self.workerThread = QtCore.QThread()
         # Init worker run() at startup (optional)
         self.workerThread.started.connect(self.worker.run)
@@ -261,6 +268,10 @@ class Ui(QMainWindow):
             self.status7.setText(text)
         elif status_number == 99:
             self.backEndWorker.setText(text)
+
+    def closeProgramXYZ(self):
+        # if "XYZPrint.exe" in (p.name() for p in psutil.process_iter()):
+        os.system("TASKKILL /F /IM XYZPrint.exe")
 
     def openProgramXYZ(self):
         # subprocess.call(["C:\\Program Files\\XYZprint\\XYZprint.exe"])
@@ -316,7 +327,8 @@ class Ui(QMainWindow):
         print(f"---> File Path : {file_path}")
         # time.sleep(2)
         # pyautogui.write(file_path)
-        pyautogui.typewrite(file_path)
+        # pyautogui.typewrite(file_path)
+        keyboard.send_keys(file_path)
         time.sleep(2)
         pyautogui.press('enter')
         self.fileState.setText('Import to XYZ.')
