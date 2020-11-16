@@ -21,7 +21,7 @@ import pywinauto.keyboard as keyboard
 
 
 class WorkerThread(QtCore.QObject):
-    def __init__(self, func, school_id, start_function, download_handler, close_ProgramXYZ, resetUiState):
+    def __init__(self, func, school_id, start_function, download_handler, closeProgramXYZ, resetUiState):
         super().__init__()
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.s.connect((socket.gethostname(), 1242))
@@ -41,7 +41,7 @@ class WorkerThread(QtCore.QObject):
         self.is_fetch = True
         self.startFunction = start_function
         self.download3DModel = download_handler
-        self.closeProgramXYZ = close_ProgramXYZ
+        self.closeProgramXYZ = closeProgramXYZ
         self.resetUiState = resetUiState
         self.last_time = time.time()
 
