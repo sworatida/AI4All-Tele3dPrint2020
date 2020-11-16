@@ -21,7 +21,7 @@ import pywinauto.keyboard as keyboard
 
 
 class WorkerThread(QtCore.QObject):
-    def __init__(self, func, school_id, start_function, download_handler, close_ProgramXYZ):
+    def __init__(self, func, school_id, start_function, download_handler, close_ProgramXYZ, resetUiState):
         super().__init__()
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.s.connect((socket.gethostname(), 1242))
@@ -30,11 +30,19 @@ class WorkerThread(QtCore.QObject):
         self.msg = ''
         self.func = func
 
+        self.printed_count = 0
+        self.now_command = ''
+        self.last_command = ''
+
+        self.count_previous_command = 0
+        self.previous_commands = []
+
         self.school_id = school_id
         self.is_fetch = True
         self.startFunction = start_function
         self.download3DModel = download_handler
         self.closeProgramXYZ = close_ProgramXYZ
+        self.resetUiState = resetUiState
         self.last_time = time.time()
 
     def setFetchStatus(self, status):
@@ -59,6 +67,7 @@ class WorkerThread(QtCore.QObject):
             elif self.msg == b'Ready':
                 self.func(2, 'lightgreen', 'Printer Ready')
             elif self.msg == b'Pre-heat Extruder':
+                self.printed_count = 0 # Reset count
                 self.func(3, 'lightgreen', 'Pre-heat Extrude')
                 self.closeProgramXYZ()
                 self.setFetchStatus(status=True)
@@ -68,34 +77,23 @@ class WorkerThread(QtCore.QObject):
                 self.func(5, 'lightgreen', 'Store Extrude')
             elif self.msg == b'Object On Heat Bed':
                 self.func(6, 'lightgreen', 'Object On Heat Bed')
+                self.printed_count += 1
             elif self.msg == b'\x00':
                 pass
 
             time_pass = time.time() - self.last_time
             
             if self.is_fetch and self.msg == b'Ready' and time_pass > 3:
+                if self.printed_count != 0:
+                    if self.last_command == b'Object On Heat Bed':
+                        self.resetUiState()
+                    else:
+                        continue
                 print("Fetching")
 
                 response = requests.get('http://tele3dprinting.com/2019/process.php?api=list')
                 # response = requests.get(self.serverAddressList.text())
                 response = response.json()
-
-                # response = [
-                #     {
-                #         "school_id": "1",
-                #         "user_id": "144",
-                #         "file_id": "236",
-                #         "file": "FIBO Tag.3w",
-                #         "file_download": "2020-11-06 11-04-40 (144) (FIBO Tag.3w).0.3w"
-                #     },
-                #     {
-                #         "school_id": "13",
-                #         "user_id": "2",
-                #         "file_id": "235",
-                #         "file": "FishSupportBase.3w",
-                #         "file_download": "2020-11-03 16-41-03 (2) (FishSupportBase.3w).0.3w"
-                #     }
-                # ]
 
                 self.last_time = time.time()
 
@@ -105,11 +103,14 @@ class WorkerThread(QtCore.QObject):
 
                         # Don't forget to reset self.is_fetch state !!! When print finish !!
                         save_path = self.download3DModel(file_id=obj['file_id'], file_name=obj['file'])
+                        # self.printed_count += 1
                         self.startFunction(is_worker_handle=True, save_path=save_path)
-                pass
 
             # if self.msg == b'Pre-heat Extruder':
             #     self.closeProgramXYZ()
+
+            self.last_command = self.now_command
+            self.now_command = self.msg
 
 
 class Ui(QMainWindow):
@@ -187,7 +188,7 @@ class Ui(QMainWindow):
         self.show()
 
         ''' ---------------------- Thread ----------------------- '''
-        self.worker = WorkerThread(self.testUpdateUI, self.sc_id, self.startButtonPressed, self.download3DModel, self.closeProgramXYZ)
+        self.worker = WorkerThread(self.testUpdateUI, self.sc_id, self.startButtonPressed, self.download3DModel, self.closeProgramXYZ, self.resetUiState)
         self.workerThread = QtCore.QThread()
         # Init worker run() at startup (optional)
         self.workerThread.started.connect(self.worker.run)
