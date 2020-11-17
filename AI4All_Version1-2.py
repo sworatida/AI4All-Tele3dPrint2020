@@ -51,6 +51,9 @@ class WorkerThread(QtCore.QObject):
     @QtCore.pyqtSlot()
     def run(self):
         while True:
+            self.last_command = self.now_command
+            self.now_command = self.msg
+
             # Long running task ...
             # self.signalExample.emit("leet", 1337)
             
@@ -73,44 +76,67 @@ class WorkerThread(QtCore.QObject):
                 self.setFetchStatus(status=True)
             elif self.msg == b'Printing':
                 self.func(4, 'lightgreen', 'Printing')
+                self.printed_count += 1
             elif self.msg == b'Store Extruder':
                 self.func(5, 'lightgreen', 'Store Extrude')
-            elif self.msg == b'Object On Heat Bed':
+            elif self.msg == b'Object On Heat Bed': # Waiting user to press OK on Printer
                 self.func(6, 'lightgreen', 'Object On Heat Bed')
-                self.printed_count += 1
             elif self.msg == b'\x00':
                 pass
 
             time_pass = time.time() - self.last_time
             
-            if self.is_fetch and self.msg == b'Ready' and time_pass > 3:
-                if self.printed_count != 0:
-                    if self.last_command == b'Object On Heat Bed':
-                        self.resetUiState()
-                    else:
-                        continue
-                print("Fetching")
+            if self.printed_count == 0:
+                if self.is_fetch and self.msg == b'Ready' and time_pass > 3:        
+                    
+                    print("Fetching")
 
-                response = requests.get('http://tele3dprinting.com/2019/process.php?api=list')
-                # response = requests.get(self.serverAddressList.text())
-                response = response.json()
+                    response = requests.get('http://tele3dprinting.com/2019/process.php?api=list')
+                    # response = requests.get(self.serverAddressList.text())
+                    response = response.json()
 
-                self.last_time = time.time()
+                    self.last_time = time.time()
 
-                for obj in response:
-                    if obj['school_id'] == self.school_id.text():
-                        self.is_fetch = False
+                    for obj in response:
+                        if obj['school_id'] == self.school_id.text():
+                            self.is_fetch = False
 
-                        # Don't forget to reset self.is_fetch state !!! When print finish !!
-                        save_path = self.download3DModel(file_id=obj['file_id'], file_name=obj['file'])
-                        # self.printed_count += 1
-                        self.startFunction(is_worker_handle=True, save_path=save_path)
+                            # Don't forget to reset self.is_fetch state !!! When print finish !!
+                            save_path = self.download3DModel(file_id=obj['file_id'], file_name=obj['file'])
+                            # self.printed_count += 1
+                            self.startFunction(is_worker_handle=True, save_path=save_path) # Status Printing is here
 
+            else: # != 0
+                print("----> Else")
+                if self.last_command == b'Object On Heat Bed':
+                    print(f"----> Obj on heat bed, {self.is_fetch=}, {self.msg=}")
+                    self.resetUiState()
+                    self.is_fetch = True
+                    if self.is_fetch and self.msg == b'Ready':  
+                        print("Fetching")
+
+                        response = requests.get('http://tele3dprinting.com/2019/process.php?api=list')
+                        # response = requests.get(self.serverAddressList.text())
+                        response = response.json()
+
+                        print(f"----> {response=}")
+
+                        self.last_time = time.time()
+
+                        for obj in response:
+                            if obj['school_id'] == self.school_id.text():
+                                self.is_fetch = False
+
+                                # Don't forget to reset self.is_fetch state !!! When print finish !!
+                                save_path = self.download3DModel(file_id=obj['file_id'], file_name=obj['file'])
+                                # self.printed_count += 1
+                                self.startFunction(is_worker_handle=True, save_path=save_path)      
+                    
             # if self.msg == b'Pre-heat Extruder':
             #     self.closeProgramXYZ()
 
-            self.last_command = self.now_command
-            self.now_command = self.msg
+            
+            
 
 
 class Ui(QMainWindow):
@@ -384,6 +410,8 @@ class Ui(QMainWindow):
                 print('Server Address ID Model is:' +
                       self.serverAddressID.text())
                 self.mouseEmulation(save_path)
+
+                # self.worker.setFetchStatus(status=True) # Reset fetch status
         else:
             pass
 
