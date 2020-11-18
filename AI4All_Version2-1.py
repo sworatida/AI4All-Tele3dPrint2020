@@ -30,6 +30,8 @@ class WorkerThread(QtCore.QObject):
         self.msg = ''
         self.func = func
 
+        self.is_obj_on_heat_bed = False
+
         self.printed_count = 0
         self.now_command = ''
         self.last_command = ''
@@ -81,6 +83,7 @@ class WorkerThread(QtCore.QObject):
                 self.func(5, 'lightgreen', 'Store Extrude')
             elif self.msg == b'Object On Heat Bed': # Waiting user to press OK on Printer
                 self.func(6, 'lightgreen', 'Object On Heat Bed')
+                self.is_obj_on_heat_bed = True
             elif self.msg == b'\x00':
                 pass
 
@@ -108,7 +111,8 @@ class WorkerThread(QtCore.QObject):
 
             else: # != 0
                 print("----> Else")
-                if self.last_command == b'Object On Heat Bed':
+                # if self.last_command == b'Object On Heat Bed':
+                if self.is_obj_on_heat_bed:
                     print(f"----> Obj on heat bed, {self.is_fetch=}, {self.msg=}")
                     self.resetUiState()
                     self.is_fetch = True
@@ -126,11 +130,12 @@ class WorkerThread(QtCore.QObject):
                         for obj in response:
                             if obj['school_id'] == self.school_id.text():
                                 self.is_fetch = False
+                                self.is_obj_on_heat_bed = False
 
                                 # Don't forget to reset self.is_fetch state !!! When print finish !!
                                 save_path = self.download3DModel(file_id=obj['file_id'], file_name=obj['file'])
                                 # self.printed_count += 1
-                                self.startFunction(is_worker_handle=True, save_path=save_path)      
+                                self.startFunction(is_worker_handle=True, save_path=save_path, is_first_time=False)      
                     
             # if self.msg == b'Pre-heat Extruder':
             #     self.closeProgramXYZ()
@@ -372,7 +377,7 @@ class Ui(QMainWindow):
         self.emulateFunction('ImageRecognition/5-Print.PNG')
 
 
-    def startButtonPressed(self, is_worker_handle=False, save_path=''):
+    def startButtonPressed(self, is_worker_handle=False, save_path='', is_first_time=True):
         # This is executed when the button is pressed
         print('-----------printButtonPressed------------')
         self.logTextEdit.append("START")
@@ -380,7 +385,7 @@ class Ui(QMainWindow):
 
         ready_status = self.status2.text()
         print(f"ready_status={ready_status}")
-        if ready_status == "Printer Ready":
+        if ready_status == "Printer Ready" or not is_first_time:
             if is_worker_handle:
                 save_path = save_path
             print(f"save_path = {save_path}")
