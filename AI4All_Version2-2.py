@@ -369,7 +369,8 @@ class Ui(QMainWindow):
         # pyautogui.typewrite(file_path)
         # keyboard.send_keys(file_path)
         time.sleep(2)
-        pyautogui.press('enter')
+        self.emulateFunction('ImageRecognition/4-OK-open-file.PNG')
+        # pyautogui.press('enter')
         self.fileState.setText('Import to XYZ.')
 
         self.worker.s.sendall(b'st:0:st')
