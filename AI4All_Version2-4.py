@@ -348,6 +348,18 @@ class Ui(QMainWindow):
         return os.path.join(os.path.expandvars("%userprofile%"), "Desktop", "3DTeleprint", file_name)
         # C:\Users\Lookpeach\Desktop\3DTeleprint\2020-10-14 16-09-58 (2) (Cube_test.stl).0.stl
 
+    def checkImageExisting(self, state_click_image_url, timeout=2):
+        found_location = None
+        last = time.time()
+        while found_location == None and time.time()-last < timeout:
+            # found_location = pyautogui.locateOnScreen(state_click_image_url, confidence= .8)
+            found_location = pyautogui.locateOnScreen(state_click_image_url)
+
+            if found_location:
+                return True
+                # buttonx, buttony = pyautogui.center(found_location)
+                # pyautogui.click(buttonx, buttony)
+
     def emulateFunction(self, state_click_image_url):
         found_location = None
         while found_location == None:
@@ -373,10 +385,25 @@ class Ui(QMainWindow):
         # pyautogui.press('enter')
         self.fileState.setText('Import to XYZ.')
 
+        is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial.png', timeout=2) # เปลี่ยนรูปด้วย
+        if is_found_error:
+            os.system('shutdown /r /t 0')
+
+        is_found_error = self.checkImageExisting('ImageErrorCase/CannotRenderFile.png', timeout=2) # เปลี่ยนรูปด้วย
+        if is_found_error:
+            os.system('shutdown /r /t 0')
+        
+        is_found_error = self.checkImageExisting('ImageErrorCase/ObjectSmall.png', timeout=2) # เปลี่ยนรูปด้วย
+        if is_found_error:
+            self.emulateFunction('ImageRecognition/4-1-No.PNG')
+
         self.worker.s.sendall(b'st:0:st')
         # time.sleep(10)
         self.emulateFunction('ImageRecognition/5-Print.PNG')
 
+        is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial.png', timeout=2) # เปลี่ยนรูปด้วย
+        if is_found_error:
+            self.emulateFunction('ImageRecognition/5-Print.PNG')
 
     def startButtonPressed(self, is_worker_handle=False, save_path='', is_first_time=True):
         # This is executed when the button is pressed
