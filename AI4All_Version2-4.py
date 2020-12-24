@@ -396,10 +396,14 @@ class Ui(QMainWindow):
         # pyautogui.typewrite(file_path)
         # keyboard.send_keys(file_path)
         time.sleep(2)
-        self.emulateFunction('ImageRecognition/4-OK-open-file.PNG')
+        # self.emulateFunction('ImageRecognition/4-OK-open-file.PNG')
+        print("Clickling - ImageRecognition/4-OK-open-file.PNG", end='.. ')
         is_found_error = self.checkImageExisting_2('ImageRecognition/4-OK-open-file.PNG', click=True) # เปลี่ยนรูปด้วย
+        print(f"{is_found_error=}")
         if is_found_error:
+            print("Clickling - ImageRecognition/4-2-OK-open-file.PNG", end='.. ')
             is_found_error = self.checkImageExisting_2('ImageRecognition/4-2-OK-open-file.PNG', click=True) # เปลี่ยนรูปด้วย
+            print(f"{is_found_error=}")
             # is_found_error
         # pyautogui.press('enter')
         self.fileState.setText('Import to XYZ.')
