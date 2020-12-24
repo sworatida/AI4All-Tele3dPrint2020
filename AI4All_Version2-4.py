@@ -348,7 +348,7 @@ class Ui(QMainWindow):
         return os.path.join(os.path.expandvars("%userprofile%"), "Desktop", "3DTeleprint", file_name)
         # C:\Users\Lookpeach\Desktop\3DTeleprint\2020-10-14 16-09-58 (2) (Cube_test.stl).0.stl
 
-    def checkImageExisting(self, state_click_image_url, timeout=2, click=False, reboot_on_not_found=False):
+    def checkImageExisting(self, state_click_image_url, timeout=10, click=False, reboot_on_not_found=False):
         found_location = None
         last = time.time()
         while found_location == None and time.time()-last < timeout:
@@ -380,62 +380,46 @@ class Ui(QMainWindow):
         # self.emulateFunction('ImageRecognition/1-Close-Login.PNG')
         # self.emulateFunction('ImageRecognition/2-Import-file.PNG')
         # self.emulateFunction('ImageRecognition/3-Open-file.PNG')
-        is_found_error = self.checkImageExisting('ImageRecognition/1-Close-Login.PNG', timeout=5, click=True)
-        is_found_error = self.checkImageExisting('ImageRecognition/2-Import-file.PNG', timeout=5, click=True)
-        is_found_error = self.checkImageExisting('ImageRecognition/3-Open-file.PNG', timeout=5, click=True)
+        is_found_error = self.checkImageExisting('ImageRecognition/1-Close-Login.PNG', click=True)
+        is_found_error = self.checkImageExisting('ImageRecognition/2-Import-file.PNG', click=True)
+        is_found_error = self.checkImageExisting('ImageRecognition/3-Open-file.PNG', click=True)
         print(f"---> File Path : {file_path}")
         # time.sleep(2)
         pyautogui.write(file_path)
         # pyautogui.typewrite(file_path)
         # keyboard.send_keys(file_path)
         time.sleep(2)
-        is_found_error = self.checkImageExisting('ImageRecognition/4-OK-open-file.PNG', timeout=5, click=True)
+        is_found_error = self.checkImageExisting('ImageRecognition/4-OK-open-file.PNG', click=True)
         self.emulateFunction('ImageRecognition/4-OK-open-file.PNG')
-        is_found_error = self.checkImageExisting('ImageRecognition/4-OK-open-file.PNG', timeout=5, click=True)
+        is_found_error = self.checkImageExisting('ImageRecognition/4-OK-open-file.PNG', click=True)
         if is_found_error:
-            is_found_error = self.checkImageExisting('ImageRecognition/4-2-OK-open-file.PNG', timeout=5, click=True, reboot_on_not_found=True) # เปลี่ยนรูปด้วย
-            # if is_found_error:
-            #     os.system('shutdown /r /t 0')
+            self.checkImageExisting('ImageRecognition/4-2-OK-open-file.PNG', click=True, reboot_on_not_found=True)
         # pyautogui.press('enter')
         self.fileState.setText('Import to XYZ.')
 
-        is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial-Cut.png', timeout=5, reboot_on_not_found=True) # เปลี่ยนรูปด้วย
-        # if is_found_error:
-        #     os.system('shutdown /r /t 0')
-
-        # is_found_error = self.checkImageExisting('ImageErrorCase/CannotRenderFile-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
-        # if is_found_error:
-        #     os.system('shutdown /r /t 0')
-        
-        is_found_error = self.checkImageExisting('ImageErrorCase/ObjectSmall-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
+        self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial-Cut.png', reboot_on_not_found=True)
+        is_found_error = self.checkImageExisting('ImageErrorCase/ObjectSmall-Cut.png')
         if is_found_error:
             self.emulateFunction('ImageRecognition/4-1-No.PNG')
 
-        is_found_error = self.checkImageExisting('ImageErrorCase/FileError-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
+        is_found_error = self.checkImageExisting('ImageErrorCase/FileError-Cut.png')
         if is_found_error:
-            self.emulateFunction('ImageErrorCase/OkFileError-Cut.PNG')
-            self.emulateFunction('ImageRecognition/1-Close-Login.PNG')
-            self.emulateFunction('ImageRecognition/2-Import-file.PNG')
-            self.emulateFunction('ImageRecognition/3-Open-file.PNG')
-            is_found_error = self.checkImageExisting('ImageErrorCase/CannotRenderFile-Cut.png', timeout=5, reboot_on_not_found=True) # เปลี่ยนรูปด้วย
-            # if is_found_error:
-            #     os.system('shutdown /r /t 0')
+            self.checkImageExisting('ImageErrorCase/OkFileError-Cut.PNG', click=True)
+            self.checkImageExisting('ImageRecognition/1-Close-Login.PNG', click=True)
+            self.checkImageExisting('ImageRecognition/2-Import-file.PNG', click=True)
+            self.checkImageExisting('ImageRecognition/3-Open-file.PNG', click=True)
+            self.checkImageExisting('ImageErrorCase/CannotRenderFile-Cut.png', reboot_on_not_found=True)
 
         self.worker.s.sendall(b'st:0:st')
         # time.sleep(10)
-        self.emulateFunction('ImageRecognition/5-Print.PNG')
+        self.checkImageExisting('ImageRecognition/5-Print.PNG', click=True)
 
-        is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
+        is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial-Cut.png') # เปลี่ยนรูปด้วย
         if is_found_error:
-            self.emulateFunction('ImageRecognition/5-Print.PNG')
+            self.checkImageExisting('ImageRecognition/5-Print.PNG', timeout=10, click=True, reboot_on_not_found=True)
 
-        is_found_error = self.checkImageExisting('ImageErrorCase/NoPrinter-Cut.png', timeout=5, reboot_on_not_found=True) # เปลี่ยนรูปด้วย
-        # if is_found_error:
-        #     os.system('shutdown /r /t 0')
-
-        is_found_error = self.checkImageExisting('ImageErrorCase/PrinterBusy-Cut.png', timeout=5, reboot_on_not_found=True) # เปลี่ยนรูปด้วย
-        # if is_found_error:
-        #     os.system('shutdown /r /t 0')
+        self.checkImageExisting('ImageErrorCase/NoPrinter-Cut.png', reboot_on_not_found=True) # เปลี่ยนรูปด้วย
+        self.checkImageExisting('ImageErrorCase/PrinterBusy-Cut.png', reboot_on_not_found=True) # เปลี่ยนรูปด้วย
 
     def startButtonPressed(self, is_worker_handle=False, save_path='', is_first_time=True):
         # This is executed when the button is pressed
