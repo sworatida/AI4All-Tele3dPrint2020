@@ -416,7 +416,8 @@ class Ui(QMainWindow):
 
         is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial-Cut.png') # เปลี่ยนรูปด้วย
         if is_found_error:
-            self.checkImageExisting('ImageRecognition/5-Print.PNG', timeout=10, click=True, reboot_on_not_found=True)
+            print(f"Found error in SettingInstalledMaterial-Cut.png")
+            self.checkImageExisting('ImageRecognition/5-Print.PNG', click=True, reboot_on_not_found=True)
 
         self.checkImageExisting('ImageErrorCase/NoPrinter-Cut.png', reboot_on_not_found=True) # เปลี่ยนรูปด้วย
         self.checkImageExisting('ImageErrorCase/PrinterBusy-Cut.png', reboot_on_not_found=True) # เปลี่ยนรูปด้วย
