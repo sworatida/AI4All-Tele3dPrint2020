@@ -1,6 +1,3 @@
-from PyQt5 import uic
-from PyQt5.QtWidgets import QLineEdit, QPushButton, QMainWindow, QLabel, QApplication, QTextEdit
-# from PyQt5.QtOpenGL import QGLWidget
 import sys
 # import subprocess
 import os
@@ -14,7 +11,6 @@ import socket
 import sys
 import time
 import json
-from PyQt5 import QtWidgets, QtCore
 
 import pywinauto.keyboard as keyboard
 
@@ -50,23 +46,14 @@ class WorkerThread(QtCore.QObject):
     def setFetchStatus(self, status):
         self.is_fetch = status
 
-    @QtCore.pyqtSlot()
     def run(self):
         while True:
             self.last_command = self.now_command
             self.now_command = self.msg
-
-            # Long running task ...
-            # self.signalExample.emit("leet", 1337)
             
             self.msg = self.s.recv(1024)
             # .decode("utf-8") # รับค่า
             print(f"---{self.msg}---")
-            # self.func(99,'white','TRUE')          
-            # if self.msg == b'\x00':
-            #     self.func(12, 'red', 'Waiting')
-            # elif self.msg == b'Initialization':
-            #     self.func(12, 'lightgreen', 'Initialization')
             if self.msg == b'Busy':
                 self.func(2, 'yellow', 'Printer Busy')
             elif self.msg == b'Ready':
@@ -144,79 +131,17 @@ class WorkerThread(QtCore.QObject):
             
 
 
-class Ui(QMainWindow):
+class Ui:
 
     def __init__(self):
-        super(Ui, self).__init__()
-
 
         with open('CONFIG.json', 'r') as file:
             self.DEFAULT_CONFIG = json.load(file)
 
 
-        uic.loadUi('ProgramSetXYZ.ui', self)
-
-        self.setWindowTitle("Tele3DPrint - FIBO - KMUTT")
-
-        self.startButton = self.findChild(
-            QPushButton, 'pushButton_3')  # Find the button
-        self.startButton.setToolTip(
-            'This is a tooltip message.')  # Edit tooltip here
-        # Remember to pass the definition/method, not the return value!
-        self.startButton.clicked.connect(self.startButtonPressed)
-
-        self.serverAddressList = self.findChild(QLineEdit, 'lineEdit')
+        # self.serverAddressList = self.findChild(QLineEdit, 'lineEdit')
         # print(f"-----> {self.serverAddressList.text()}")
-        self.serverAddressList.setToolTip(
-            'This is a tooltip message.')  # Edit tooltip here
-        self.serverAddressID = self.findChild(QLineEdit, 'lineEdit_3')
-        self.serverAddressID.setToolTip(
-            'This is a tooltip message.')  # Edit tooltip here
 
-        self.stopButton = self.findChild(QPushButton, 'pushButton_2')
-        self.stopButton.setToolTip(
-            'This is a tooltip message.')  # Edit tooltip here
-        self.stopButton.clicked.connect(self.stopButtonPressed)
-
-        self.resetButton = self.findChild(QPushButton, 'pushButton')
-        self.resetButton.setToolTip(
-            'This is a tooltip message.')  # Edit tooltip here
-        self.resetButton.clicked.connect(self.resetButtonPressed)
-
-        self.logTextEdit = self.findChild(QTextEdit, 'logText')
-        self.logTextEdit.setToolTip(
-            'This is a tooltip message.')  # Edit tooltip here
-        self.logTextEdit.clear()  # Delete all string in QTextEdit
-        # self.logTextEdit.append('asdasd') # Add new string to QTextEdot
-
-        # self.messages.append(f'Running Program..')
-        # self.logTextEdit.setText("\n".join(self.messages))
-
-        self.sc_id = self.findChild(QLineEdit, 'lineEdit_2')
-        self.sc_id.setText(self.DEFAULT_CONFIG['SCHOOL_ID'])
-
-        self.status1 = self.findChild(QLabel, 'label_12')  # download3DModel
-        self.status2 = self.findChild(QLabel, 'label_13')  # เปิดโปรแกรม
-        self.status3 = self.findChild(QLabel, 'label_14')
-        self.status4 = self.findChild(QLabel, 'label_15')
-        self.status5 = self.findChild(QLabel, 'label_16')
-        self.status6 = self.findChild(QLabel, 'label_17')
-        self.status7 = self.findChild(QLabel, 'label_18')
-        self.status8 = self.findChild(QLabel, 'label_19')
-        self.status9 = self.findChild(QLabel, 'label_20')
-        self.status10 = self.findChild(QLabel, 'label_21')
-        self.status11 = self.findChild(QLabel, 'label_22')
-        self.status12 = self.findChild(QLabel, 'label_23')
-
-        self.resetUiState()
-
-        self.backEndWorker = self.findChild(QLabel,'label_3')
-        self.backEndState = self.findChild(QLabel,'label_4')
-        self.fileState = self.findChild(QLabel,'label_5')
-        self.printerStatus = self.findChild(QLabel,'label_6')
-        self.fileName = self.findChild(QLabel,'label_8')
-
-        self.show()
 
         ''' ---------------------- Thread ----------------------- '''
         self.worker = WorkerThread(self.testUpdateUI, self.sc_id, self.startButtonPressed, self.download3DModel, self.closeProgramXYZ, self.resetUiState)
@@ -228,89 +153,10 @@ class Ui(QMainWindow):
         self.worker.moveToThread(self.workerThread)
         self.workerThread.start()
 
-    def resetUiState(self):
-        self.status1.setStyleSheet("background-color: white")
-        self.status1.setText("Waiting...")
-        self.status1.setToolTip('This is a tooltip message.')
-
-        self.status2.setStyleSheet("background-color: white")
-        self.status2.setText("Waiting...")
-        self.status2.setToolTip('This is a tooltip message.')
-
-        self.status3.setStyleSheet("background-color: white")
-        self.status3.setText("Waiting...")
-        self.status3.setToolTip('This is a tooltip message.')
-
-        self.status4.setStyleSheet("background-color: white")
-        self.status4.setText("Waiting...")
-        self.status4.setToolTip('This is a tooltip message.')
-
-        self.status5.setStyleSheet("background-color: white")
-        self.status5.setText("Waiting...")
-        self.status5.setToolTip('This is a tooltip message.')
-
-        self.status6.setStyleSheet("background-color: white")
-        self.status6.setText("Waiting...")
-        self.status6.setToolTip('This is a tooltip message.')
-
-        self.status7.setStyleSheet("background-color: white")
-        self.status7.setText("Waiting...")
-        self.status7.setToolTip('This is a tooltip message.')
-
-        self.status8.setStyleSheet("background-color: white")
-        self.status8.setText("Waiting...")
-        self.status8.setToolTip('This is a tooltip message.')
-
-        self.status9.setStyleSheet("background-color: white")
-        self.status9.setText("Waiting...")
-        self.status9.setToolTip('This is a tooltip message.')
-
-        self.status10.setStyleSheet("background-color: white")
-        self.status10.setText("Waiting...")
-        self.status10.setToolTip('This is a tooltip message.')
-
-        self.status11.setStyleSheet("background-color: white")
-        self.status11.setText("Waiting...")
-        self.status11.setToolTip('This is a tooltip message.')
-
-        self.status12.setStyleSheet("background-color: white")
-        self.status12.setText("Waiting...")
-        self.status12.setToolTip('This is a tooltip message.')
-
-
-    def testUpdateUI(self, status_number, color, text):
-        text = str(text)
-        print(status_number, color, text)
-        if status_number == 2:
-            self.status2.setStyleSheet("background-color: " + color)
-            self.status2.setText(text)
-            self.printerStatus.setText(text)
-        elif status_number == 3:
-            self.status3.setStyleSheet("background-color: " + color)
-            self.status3.setText(text)
-            self.printerStatus.setText(text)
-        elif status_number == 4:
-            self.status4.setStyleSheet("background-color: " + color)
-            self.status4.setText(text)
-            self.printerStatus.setText(text)
-        elif status_number == 5:
-            self.status5.setStyleSheet("background-color: " + color)
-            self.status5.setText(text)
-            self.printerStatus.setText(text)
-        elif status_number == 6:
-            self.status6.setStyleSheet("background-color: " + color)
-            self.status6.setText(text)
-            self.printerStatus.setText(text)
-        elif status_number == 7:
-            self.status7.setStyleSheet("background-color: " + color)
-            self.status7.setText(text)
-        elif status_number == 99:
-            self.backEndWorker.setText(text)
 
     def closeProgramXYZ(self):
         # if "XYZPrint.exe" in (p.name() for p in psutil.process_iter()):
         os.system("TASKKILL /F /IM XYZPrint.exe")
-        self.resetUiState()
 
     def openProgramXYZ(self):
         # subprocess.call(["C:\\Program Files\\XYZprint\\XYZprint.exe"])
@@ -324,22 +170,16 @@ class Ui(QMainWindow):
 
         try:
             if not os.path.exists(directory_path):  # Check is path alive?
-                self.backEndState.setText('Check is path alive?')
                 os.makedirs(directory_path)  # Create folder
-                self.backEndState.setText('Create folder')
         except OSError:
             print('Error: Creating directory. ' + directory_path)
-            self.backEndState.setText('Error: Creating directory.')
-
-
-        self.fileName.setText(file_name)
 
         # download_url = 'http://tele3dprinting.com/2019/process.php?api=stl.read&file_id=' + file_id
         download_url = self.serverAddressID.text() + file_id
-        self.logTextEdit.append(download_url)
+        print(f"{download_url=}")
         r = requests.get(download_url, allow_redirects=True)
         save_path = directory_path+'/'+file_name
-        self.logTextEdit.append(save_path)
+        print(f"{save_path=}")
         with open(save_path, 'wb') as file:
             file.write(r.content)
 
@@ -432,7 +272,6 @@ class Ui(QMainWindow):
     def startButtonPressed(self, is_worker_handle=False, save_path='', is_first_time=True):
         # This is executed when the button is pressed
         print('-----------printButtonPressed------------')
-        self.logTextEdit.append("START")
         self.worker.s.sendall(b"st:0:st")
 
         ready_status = self.status2.text()
