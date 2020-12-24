@@ -360,6 +360,20 @@ class Ui(QMainWindow):
                 # buttonx, buttony = pyautogui.center(found_location)
                 # pyautogui.click(buttonx, buttony)
 
+    def checkImageExisting_2(self, state_click_image_url, timeout=5, click=False):
+        found_location = None
+        last = time.time()
+        while found_location == None and time.time()-last < timeout:
+            # found_location = pyautogui.locateOnScreen(state_click_image_url, confidence= .8)
+            found_location = pyautogui.locateOnScreen(state_click_image_url)
+
+            if found_location:
+                if click:
+                    buttonx, buttony = pyautogui.center(found_location)
+                    pyautogui.click(buttonx, buttony)
+                return True
+            
+
     def emulateFunction(self, state_click_image_url):
         found_location = None
         while found_location == None:
@@ -373,9 +387,9 @@ class Ui(QMainWindow):
 
     def mouseEmulation(self, file_path):
         time.sleep(15)
-        self.emulateFunction('ImageRecognition/1-Close-Login.PNG')
-        self.emulateFunction('ImageRecognition/2-Import-file.PNG')
-        self.emulateFunction('ImageRecognition/3-Open-file.PNG')
+        self.checkImageExisting_2('ImageRecognition/1-Close-Login.PNG', click=True)
+        self.checkImageExisting_2('ImageRecognition/2-Import-file.PNG', click=True)
+        self.checkImageExisting_2('ImageRecognition/3-Open-file.PNG', click=True)
         print(f"---> File Path : {file_path}")
         # time.sleep(2)
         pyautogui.write(file_path)
