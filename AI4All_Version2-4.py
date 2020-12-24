@@ -348,7 +348,7 @@ class Ui(QMainWindow):
         return os.path.join(os.path.expandvars("%userprofile%"), "Desktop", "3DTeleprint", file_name)
         # C:\Users\Lookpeach\Desktop\3DTeleprint\2020-10-14 16-09-58 (2) (Cube_test.stl).0.stl
 
-    def checkImageExisting(self, state_click_image_url, timeout=2):
+    def checkImageExisting(self, state_click_image_url, timeout=5):
         found_location = None
         last = time.time()
         while found_location == None and time.time()-last < timeout:
@@ -397,15 +397,14 @@ class Ui(QMainWindow):
         # keyboard.send_keys(file_path)
         time.sleep(2)
         self.emulateFunction('ImageRecognition/4-OK-open-file.PNG')
-        is_found_error = self.checkImageExisting('ImageRecognition/4-OK-open-file.PNG', timeout=5) # เปลี่ยนรูปด้วย
+        is_found_error = self.checkImageExisting_2('ImageRecognition/4-OK-open-file.PNG', click=True) # เปลี่ยนรูปด้วย
         if is_found_error:
-            self.emulateFunction('ImageRecognition/4-2-OK-open-file.PNG')
-        else:
-            self.emulateFunction('ImageRecognition/4-OK-open-file.PNG')
+            is_found_error = self.checkImageExisting_2('ImageRecognition/4-2-OK-open-file.PNG', click=True) # เปลี่ยนรูปด้วย
+            # is_found_error
         # pyautogui.press('enter')
         self.fileState.setText('Import to XYZ.')
 
-        is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
+        is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial-Cut.png') # เปลี่ยนรูปด้วย
         if is_found_error:
             os.system('shutdown /r /t 0')
 
