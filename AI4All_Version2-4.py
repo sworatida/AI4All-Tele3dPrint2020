@@ -369,7 +369,7 @@ class Ui(QMainWindow):
         while found_location == None:
             # found_location = pyautogui.locateOnScreen(state_click_image_url, confidence=0.8)
             # found_location = pyautogui.locateOnScreen(state_click_image_url)
-            found_location = pyautogui.locateOnScreen(state_click_image_url, grayscale=True)
+            found_location = pyautogui.locateOnScreen(state_click_image_url)
 
             if found_location:
                 buttonx, buttony = pyautogui.center(found_location)
