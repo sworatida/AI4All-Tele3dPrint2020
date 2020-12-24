@@ -363,8 +363,9 @@ class Ui(QMainWindow):
     def emulateFunction(self, state_click_image_url):
         found_location = None
         while found_location == None:
-            found_location = pyautogui.locateOnScreen(state_click_image_url, confidence=0.8)
+            # found_location = pyautogui.locateOnScreen(state_click_image_url, confidence=0.8)
             # found_location = pyautogui.locateOnScreen(state_click_image_url)
+            found_location = pyautogui.locateOnScreen(state_click_image_url, grayscale=True)
 
             if found_location:
                 buttonx, buttony = pyautogui.center(found_location)
@@ -382,35 +383,51 @@ class Ui(QMainWindow):
         # keyboard.send_keys(file_path)
         time.sleep(2)
         self.emulateFunction('ImageRecognition/4-OK-open-file.PNG')
+        is_found_error = self.checkImageExisting('ImageRecognition/4-OK-open-file.PNG', timeout=5) # เปลี่ยนรูปด้วย
+        if is_found_error:
+            self.emulateFunction('ImageRecognition/4-2-OK-open-file.PNG')
+        else:
+            self.emulateFunction('ImageRecognition/4-OK-open-file.PNG')
         # pyautogui.press('enter')
         self.fileState.setText('Import to XYZ.')
 
-        # is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial-Cut.png', timeout=2) # เปลี่ยนรูปด้วย
-        # if is_found_error:
-        #     os.system('shutdown /r /t 0')
+        is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
+        if is_found_error:
+            os.system('shutdown /r /t 0')
 
-        # is_found_error = self.checkImageExisting('ImageErrorCase/CannotRenderFile-Cut.png', timeout=2) # เปลี่ยนรูปด้วย
+        # is_found_error = self.checkImageExisting('ImageErrorCase/CannotRenderFile-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
         # if is_found_error:
         #     os.system('shutdown /r /t 0')
         
-        is_found_error = self.checkImageExisting('ImageErrorCase/ObjectSmall-Cut.png', timeout=2) # เปลี่ยนรูปด้วย
+        is_found_error = self.checkImageExisting('ImageErrorCase/ObjectSmall-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
         if is_found_error:
             self.emulateFunction('ImageRecognition/4-1-No.PNG')
 
-        is_found_error = self.checkImageExisting('ImageErrorCase/FileError-Cut.png', timeout=2) # เปลี่ยนรูปด้วย
+        is_found_error = self.checkImageExisting('ImageErrorCase/FileError-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
         if is_found_error:
             self.emulateFunction('ImageErrorCase/OkFileError-Cut.PNG')
             self.emulateFunction('ImageRecognition/1-Close-Login.PNG')
             self.emulateFunction('ImageRecognition/2-Import-file.PNG')
             self.emulateFunction('ImageRecognition/3-Open-file.PNG')
+            is_found_error = self.checkImageExisting('ImageErrorCase/CannotRenderFile-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
+            if is_found_error:
+                os.system('shutdown /r /t 0')
 
         self.worker.s.sendall(b'st:0:st')
         # time.sleep(10)
         self.emulateFunction('ImageRecognition/5-Print.PNG')
 
-        is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial-Cut.png', timeout=2) # เปลี่ยนรูปด้วย
+        is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
         if is_found_error:
             self.emulateFunction('ImageRecognition/5-Print.PNG')
+
+        is_found_error = self.checkImageExisting('ImageErrorCase/NoPrinter-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
+        if is_found_error:
+            os.system('shutdown /r /t 0')
+
+        is_found_error = self.checkImageExisting('ImageErrorCase/PrinterBusy-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
+        if is_found_error:
+            os.system('shutdown /r /t 0')
 
     def startButtonPressed(self, is_worker_handle=False, save_path='', is_first_time=True):
         # This is executed when the button is pressed
