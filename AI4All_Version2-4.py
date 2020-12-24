@@ -19,7 +19,6 @@ from PyQt5 import QtWidgets, QtCore
 import pywinauto.keyboard as keyboard
 
 
-
 class WorkerThread(QtCore.QObject):
     def __init__(self, func, school_id, start_function, download_handler, closeProgramXYZ, resetUiState):
         super().__init__()
@@ -58,11 +57,11 @@ class WorkerThread(QtCore.QObject):
 
             # Long running task ...
             # self.signalExample.emit("leet", 1337)
-            
+
             self.msg = self.s.recv(1024)
             # .decode("utf-8") # รับค่า
             print(f"---{self.msg}---")
-            # self.func(99,'white','TRUE')          
+            # self.func(99,'white','TRUE')
             # if self.msg == b'\x00':
             #     self.func(12, 'red', 'Waiting')
             # elif self.msg == b'Initialization':
@@ -72,7 +71,7 @@ class WorkerThread(QtCore.QObject):
             elif self.msg == b'Ready':
                 self.func(2, 'lightgreen', 'Printer Ready')
             elif self.msg == b'Pre-heat Extruder':
-                self.printed_count = 0 # Reset count
+                self.printed_count = 0  # Reset count
                 self.func(3, 'lightgreen', 'Pre-heat Extrude')
                 self.closeProgramXYZ()
                 self.setFetchStatus(status=True)
@@ -81,20 +80,21 @@ class WorkerThread(QtCore.QObject):
                 self.printed_count += 1
             elif self.msg == b'Store Extruder':
                 self.func(5, 'lightgreen', 'Store Extrude')
-            elif self.msg == b'Object On Heat Bed': # Waiting user to press OK on Printer
+            elif self.msg == b'Object On Heat Bed':  # Waiting user to press OK on Printer
                 self.func(6, 'lightgreen', 'Object On Heat Bed')
                 self.is_obj_on_heat_bed = True
             elif self.msg == b'\x00':
                 pass
 
             time_pass = time.time() - self.last_time
-            
+
             if self.printed_count == 0:
-                if self.is_fetch and self.msg == b'Ready' and time_pass > 3:        
-                    
+                if self.is_fetch and self.msg == b'Ready' and time_pass > 3:
+
                     print("Fetching")
 
-                    response = requests.get('http://tele3dprinting.com/2019/process.php?api=list')
+                    response = requests.get(
+                        'http://tele3dprinting.com/2019/process.php?api=list')
                     # response = requests.get(self.serverAddressList.text())
                     response = response.json()
 
@@ -105,21 +105,26 @@ class WorkerThread(QtCore.QObject):
                             self.is_fetch = False
 
                             # Don't forget to reset self.is_fetch state !!! When print finish !!
-                            save_path = self.download3DModel(file_id=obj['file_id'], file_name=obj['file'])
+                            save_path = self.download3DModel(
+                                file_id=obj['file_id'], file_name=obj['file'])
                             # self.printed_count += 1
-                            self.startFunction(is_worker_handle=True, save_path=save_path) # Status Printing is here
+                            # Status Printing is here
+                            self.startFunction(
+                                is_worker_handle=True, save_path=save_path)
 
-            else: # != 0
+            else:  # != 0
                 print("----> Else")
                 # if self.last_command == b'Object On Heat Bed':
                 if self.is_obj_on_heat_bed:
-                    print(f"----> Obj on heat bed, {self.is_fetch=}, {self.msg=}")
+                    print(
+                        f"----> Obj on heat bed, {self.is_fetch=}, {self.msg=}")
                     self.resetUiState()
                     self.is_fetch = True
-                    if self.is_fetch and self.msg == b'Ready':  
+                    if self.is_fetch and self.msg == b'Ready':
                         print("Fetching")
 
-                        response = requests.get('http://tele3dprinting.com/2019/process.php?api=list')
+                        response = requests.get(
+                            'http://tele3dprinting.com/2019/process.php?api=list')
                         # response = requests.get(self.serverAddressList.text())
                         response = response.json()
 
@@ -133,15 +138,14 @@ class WorkerThread(QtCore.QObject):
                                 self.is_obj_on_heat_bed = False
 
                                 # Don't forget to reset self.is_fetch state !!! When print finish !!
-                                save_path = self.download3DModel(file_id=obj['file_id'], file_name=obj['file'])
+                                save_path = self.download3DModel(
+                                    file_id=obj['file_id'], file_name=obj['file'])
                                 # self.printed_count += 1
-                                self.startFunction(is_worker_handle=True, save_path=save_path, is_first_time=False)      
-                    
+                                self.startFunction(
+                                    is_worker_handle=True, save_path=save_path, is_first_time=False)
+
             # if self.msg == b'Pre-heat Extruder':
             #     self.closeProgramXYZ()
-
-            
-            
 
 
 class Ui(QMainWindow):
@@ -149,10 +153,8 @@ class Ui(QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
 
-
         with open('CONFIG.json', 'r') as file:
             self.DEFAULT_CONFIG = json.load(file)
-
 
         uic.loadUi('ProgramSetXYZ.ui', self)
 
@@ -210,16 +212,17 @@ class Ui(QMainWindow):
 
         self.resetUiState()
 
-        self.backEndWorker = self.findChild(QLabel,'label_3')
-        self.backEndState = self.findChild(QLabel,'label_4')
-        self.fileState = self.findChild(QLabel,'label_5')
-        self.printerStatus = self.findChild(QLabel,'label_6')
-        self.fileName = self.findChild(QLabel,'label_8')
+        self.backEndWorker = self.findChild(QLabel, 'label_3')
+        self.backEndState = self.findChild(QLabel, 'label_4')
+        self.fileState = self.findChild(QLabel, 'label_5')
+        self.printerStatus = self.findChild(QLabel, 'label_6')
+        self.fileName = self.findChild(QLabel, 'label_8')
 
         self.show()
 
         ''' ---------------------- Thread ----------------------- '''
-        self.worker = WorkerThread(self.testUpdateUI, self.sc_id, self.startButtonPressed, self.download3DModel, self.closeProgramXYZ, self.resetUiState)
+        self.worker = WorkerThread(self.testUpdateUI, self.sc_id, self.startButtonPressed,
+                                   self.download3DModel, self.closeProgramXYZ, self.resetUiState)
         self.workerThread = QtCore.QThread()
         # Init worker run() at startup (optional)
         self.workerThread.started.connect(self.worker.run)
@@ -277,7 +280,6 @@ class Ui(QMainWindow):
         self.status12.setText("Waiting...")
         self.status12.setToolTip('This is a tooltip message.')
 
-
     def testUpdateUI(self, status_number, color, text):
         text = str(text)
         print(status_number, color, text)
@@ -331,7 +333,6 @@ class Ui(QMainWindow):
             print('Error: Creating directory. ' + directory_path)
             self.backEndState.setText('Error: Creating directory.')
 
-
         self.fileName.setText(file_name)
 
         # download_url = 'http://tele3dprinting.com/2019/process.php?api=stl.read&file_id=' + file_id
@@ -349,47 +350,59 @@ class Ui(QMainWindow):
         # C:\Users\Lookpeach\Desktop\3DTeleprint\2020-10-14 16-09-58 (2) (Cube_test.stl).0.stl
 
     def checkImageExisting(self, state_click_image_url, timeout=5):
+        print(f"[checkImageExisting_2] - {state_click_image_url}", end='.. ')
         found_location = None
+        is_found_image = False
         last = time.time()
         while found_location == None and time.time()-last < timeout:
-            # found_location = pyautogui.locateOnScreen(state_click_image_url, confidence= .8)
             found_location = pyautogui.locateOnScreen(state_click_image_url)
 
             if found_location:
-                return True
+                is_found_image = True
                 # buttonx, buttony = pyautogui.center(found_location)
                 # pyautogui.click(buttonx, buttony)
+        print(f"{'Found' if is_found_image else 'NotFound'}")
+        return is_found_image
 
     def checkImageExisting_2(self, state_click_image_url, timeout=5, click=False):
+        print(f"[checkImageExisting_2] - {state_click_image_url}", end='.. ')
         found_location = None
+        is_found_image = False
         last = time.time()
         while found_location == None and time.time()-last < timeout:
-            # found_location = pyautogui.locateOnScreen(state_click_image_url, confidence= .8)
             found_location = pyautogui.locateOnScreen(state_click_image_url)
 
             if found_location:
                 if click:
                     buttonx, buttony = pyautogui.center(found_location)
                     pyautogui.click(buttonx, buttony)
-                return True
-            
+                is_found_image = False
+
+        print(f"{'Found' if is_found_image else 'NotFound'}")
+        return is_found_image
 
     def emulateFunction(self, state_click_image_url):
+        print(f"[emulateFunction] - {state_click_image_url}", end='.. ')
         found_location = None
         while found_location == None:
             # found_location = pyautogui.locateOnScreen(state_click_image_url, confidence=0.8)
             # found_location = pyautogui.locateOnScreen(state_click_image_url)
-            found_location = pyautogui.locateOnScreen(state_click_image_url, grayscale=True)
+            found_location = pyautogui.locateOnScreen(
+                state_click_image_url, grayscale=True)
 
             if found_location:
                 buttonx, buttony = pyautogui.center(found_location)
                 pyautogui.click(buttonx, buttony)
+        print(f"{'Found' if found_location != None else 'NotFound'}")
 
     def mouseEmulation(self, file_path):
         time.sleep(15)
-        self.checkImageExisting_2('ImageRecognition/1-Close-Login.PNG', click=True)
-        self.checkImageExisting_2('ImageRecognition/2-Import-file.PNG', click=True)
-        self.checkImageExisting_2('ImageRecognition/3-Open-file.PNG', click=True)
+        self.checkImageExisting_2(
+            'ImageRecognition/1-Close-Login.PNG', click=True)
+        self.checkImageExisting_2(
+            'ImageRecognition/2-Import-file.PNG', click=True)
+        self.checkImageExisting_2(
+            'ImageRecognition/3-Open-file.PNG', click=True)
         print(f"---> File Path : {file_path}")
         # time.sleep(2)
         pyautogui.write(file_path)
@@ -397,53 +410,54 @@ class Ui(QMainWindow):
         # keyboard.send_keys(file_path)
         time.sleep(2)
         # self.emulateFunction('ImageRecognition/4-OK-open-file.PNG')
-        print("Clickling - ImageRecognition/4-OK-open-file.PNG", end='.. ')
-        is_found_error = self.checkImageExisting_2('ImageRecognition/4-OK-open-file.PNG', click=True) # เปลี่ยนรูปด้วย
-        print(f"{is_found_error=}")
-        if is_found_error:
-            print("Clickling - ImageRecognition/4-2-OK-open-file.PNG", end='.. ')
-            is_found_error = self.checkImageExisting_2('ImageRecognition/4-2-OK-open-file.PNG', click=True) # เปลี่ยนรูปด้วย
-            print(f"{is_found_error=}")
-            # is_found_error
+        is_found_image = self.checkImageExisting_2(
+            'ImageRecognition/4-OK-open-file.PNG', click=True)  # เปลี่ยนรูปด้วย
+        if not is_found_image:
+            is_found_image = self.checkImageExisting_2(
+                'ImageRecognition/4-2-OK-open-file.PNG', click=True)  # เปลี่ยนรูปด้วย
+            # is_found_image
         # pyautogui.press('enter')
         self.fileState.setText('Import to XYZ.')
 
-        is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial-Cut.png') # เปลี่ยนรูปด้วย
-        if is_found_error:
+        is_found_image = self.checkImageExisting(
+            'ImageErrorCase/SettingInstalledMaterial-Cut.png')  # เปลี่ยนรูปด้วย
+        if not is_found_image:
             os.system('shutdown /r /t 0')
 
-        # is_found_error = self.checkImageExisting('ImageErrorCase/CannotRenderFile-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
-        # if is_found_error:
-        #     os.system('shutdown /r /t 0')
-        
-        is_found_error = self.checkImageExisting('ImageErrorCase/ObjectSmall-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
-        if is_found_error:
+        is_found_image = self.checkImageExisting(
+            'ImageErrorCase/ObjectSmall-Cut.png')  # เปลี่ยนรูปด้วย
+        if not is_found_image:
             self.emulateFunction('ImageRecognition/4-1-No.PNG')
 
-        is_found_error = self.checkImageExisting('ImageErrorCase/FileError-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
-        if is_found_error:
+        is_found_image = self.checkImageExisting(
+            'ImageErrorCase/FileError-Cut.png')  # เปลี่ยนรูปด้วย
+        if not is_found_image:
             self.emulateFunction('ImageErrorCase/OkFileError-Cut.PNG')
             self.emulateFunction('ImageRecognition/1-Close-Login.PNG')
             self.emulateFunction('ImageRecognition/2-Import-file.PNG')
             self.emulateFunction('ImageRecognition/3-Open-file.PNG')
-            is_found_error = self.checkImageExisting('ImageErrorCase/CannotRenderFile-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
-            if is_found_error:
+            is_found_image = self.checkImageExisting(
+                'ImageErrorCase/CannotRenderFile-Cut.png')  # เปลี่ยนรูปด้วย
+            if not is_found_image:
                 os.system('shutdown /r /t 0')
 
         self.worker.s.sendall(b'st:0:st')
         # time.sleep(10)
         self.emulateFunction('ImageRecognition/5-Print.PNG')
 
-        is_found_error = self.checkImageExisting('ImageErrorCase/SettingInstalledMaterial-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
-        if is_found_error:
+        is_found_image = self.checkImageExisting(
+            'ImageErrorCase/SettingInstalledMaterial-Cut.png')  # เปลี่ยนรูปด้วย
+        if not is_found_image:
             self.emulateFunction('ImageRecognition/5-Print.PNG')
 
-        is_found_error = self.checkImageExisting('ImageErrorCase/NoPrinter-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
-        if is_found_error:
+        is_found_image = self.checkImageExisting(
+            'ImageErrorCase/NoPrinter-Cut.png')  # เปลี่ยนรูปด้วย
+        if not is_found_image:
             os.system('shutdown /r /t 0')
 
-        is_found_error = self.checkImageExisting('ImageErrorCase/PrinterBusy-Cut.png', timeout=5) # เปลี่ยนรูปด้วย
-        if is_found_error:
+        is_found_image = self.checkImageExisting(
+            'ImageErrorCase/PrinterBusy-Cut.png')  # เปลี่ยนรูปด้วย
+        if not is_found_image:
             os.system('shutdown /r /t 0')
 
     def startButtonPressed(self, is_worker_handle=False, save_path='', is_first_time=True):
