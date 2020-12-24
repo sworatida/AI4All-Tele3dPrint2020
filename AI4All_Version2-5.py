@@ -348,7 +348,7 @@ class Ui(QMainWindow):
         return os.path.join(os.path.expandvars("%userprofile%"), "Desktop", "3DTeleprint", file_name)
         # C:\Users\Lookpeach\Desktop\3DTeleprint\2020-10-14 16-09-58 (2) (Cube_test.stl).0.stl
 
-    def checkImageExisting(self, state_click_image_url, timeout=10, click=False, reboot_on_not_found=False):
+    def checkImageExisting(self, state_click_image_url, timeout=5, click=False, reboot_on_not_found=False):
         found_location = None
         last = time.time()
         while found_location == None and time.time()-last < timeout:
