@@ -376,7 +376,7 @@ class Ui(QMainWindow):
                 if click:
                     buttonx, buttony = pyautogui.center(found_location)
                     pyautogui.click(buttonx, buttony)
-                is_found_image = False
+                is_found_image = True
 
         print(f"{'Found' if is_found_image else 'NotFound'}")
         return is_found_image
