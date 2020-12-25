@@ -427,10 +427,10 @@ class Ui(QMainWindow):
         is_found_image = self.checkImageExisting(
             'ImageErrorCase/FileError-Cut.png')  # เปลี่ยนรูปด้วย
         if not is_found_image:
-            self.checkImageExisting_2('ImageErrorCase/OkFileError-Cut.PNG')
-            self.checkImageExisting_2('ImageRecognition/1-Close-Login.PNG')
-            self.checkImageExisting_2('ImageRecognition/2-Import-file.PNG')
-            self.checkImageExisting_2('ImageRecognition/3-Open-file.PNG')
+            self.checkImageExisting_2('ImageErrorCase/OkFileError-Cut.PNG',click=True)
+            self.checkImageExisting_2('ImageRecognition/1-Close-Login.PNG',click=True)
+            self.checkImageExisting_2('ImageRecognition/2-Import-file.PNG',click=True)
+            self.checkImageExisting_2('ImageRecognition/3-Open-file.PNG',click=True)
             is_found_image = self.checkImageExisting(
                 'ImageErrorCase/CannotRenderFile-Cut.png')  # เปลี่ยนรูปด้วย
             # if not is_found_image:
@@ -438,17 +438,17 @@ class Ui(QMainWindow):
 
         self.worker.s.sendall(b'st:0:st')
         # time.sleep(10)
-        self.emulateFunction('ImageRecognition/5-Print.PNG')
+        self.checkImageExisting_2('ImageRecognition/5-Print.PNG',click=True)
 
         is_handle_error = False
         is_found_image = self.checkImageExisting(
             'ImageErrorCase/SettingInstalledMaterial-Cut.png',timeout=10)  # เปลี่ยนรูปด้วย
         if is_found_image:
-            self.emulateFunction('ImageRecognition/5-Print.PNG')
+            self.checkImageExisting_2('ImageRecognition/5-Print.PNG', click=True)
             is_found_image = self.checkImageExisting(
                 'ImageErrorCase/PrinterBusy-Cut.png')
             if is_found_image:
-                self.emulateFunction('ImageRecognition/5-1-Print.PNG')
+                self.checkImageExisting_2('ImageRecognition/5-1-Print.PNG',click=True)
             is_handle_error = True
 
         if not is_handle_error:
