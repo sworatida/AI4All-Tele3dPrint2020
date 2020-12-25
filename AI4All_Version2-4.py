@@ -420,7 +420,7 @@ class Ui(QMainWindow):
         self.fileState.setText('Import to XYZ.')
 
         is_found_image = self.checkImageExisting(
-            'ImageErrorCase/SettingInstalledMaterial-Cut.png')  # เปลี่ยนรูปด้วย
+            'ImageErrorCase/SettingInstalledMaterial-Cut.png', timeout=10)  # เปลี่ยนรูปด้วย
         # if not is_found_image:
         #     os.system('shutdown /r /t 0')
 
