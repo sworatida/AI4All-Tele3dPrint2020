@@ -421,8 +421,8 @@ class Ui(QMainWindow):
 
         is_found_image = self.checkImageExisting(
             'ImageErrorCase/SettingInstalledMaterial-Cut.png')  # เปลี่ยนรูปด้วย
-        if not is_found_image:
-            os.system('shutdown /r /t 0')
+        # if not is_found_image:
+        #     os.system('shutdown /r /t 0')
 
         is_found_image = self.checkImageExisting(
             'ImageErrorCase/ObjectSmall-Cut.png')  # เปลี่ยนรูปด้วย
@@ -438,8 +438,8 @@ class Ui(QMainWindow):
             self.emulateFunction('ImageRecognition/3-Open-file.PNG')
             is_found_image = self.checkImageExisting(
                 'ImageErrorCase/CannotRenderFile-Cut.png')  # เปลี่ยนรูปด้วย
-            if not is_found_image:
-                os.system('shutdown /r /t 0')
+            # if not is_found_image:
+            #     os.system('shutdown /r /t 0')
 
         self.worker.s.sendall(b'st:0:st')
         # time.sleep(10)
@@ -460,15 +460,15 @@ class Ui(QMainWindow):
         if not is_handle_error:
             is_found_image = self.checkImageExisting(
                 'ImageErrorCase/NoPrinter-Cut.png')  # เปลี่ยนรูปด้วย
-            if not is_found_image:
-                os.system('shutdown /r /t 0')
+            # if not is_found_image:
+            #     os.system('shutdown /r /t 0')
             is_handle_error = True
 
         if not is_handle_error:
             is_found_image = self.checkImageExisting(
                 'ImageErrorCase/PrinterBusy-Cut.png')  # เปลี่ยนรูปด้วย
-            if not is_found_image:
-                os.system('shutdown /r /t 0')
+            # if not is_found_image:
+            #     os.system('shutdown /r /t 0')
             is_handle_error = True
 
     def startButtonPressed(self, is_worker_handle=False, save_path='', is_first_time=True):
