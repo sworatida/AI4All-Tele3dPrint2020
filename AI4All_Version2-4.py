@@ -420,11 +420,6 @@ class Ui(QMainWindow):
         self.fileState.setText('Import to XYZ.')
 
         is_found_image = self.checkImageExisting(
-            'ImageErrorCase/SettingInstalledMaterial-Cut.png', timeout=10)  # เปลี่ยนรูปด้วย
-        # if not is_found_image:
-        #     os.system('shutdown /r /t 0')
-
-        is_found_image = self.checkImageExisting(
             'ImageErrorCase/ObjectSmall-Cut.png')  # เปลี่ยนรูปด้วย
         if not is_found_image:
             self.emulateFunction('ImageRecognition/4-1-No.PNG')
@@ -445,11 +440,10 @@ class Ui(QMainWindow):
         # time.sleep(10)
         self.emulateFunction('ImageRecognition/5-Print.PNG')
 
-
         is_handle_error = False
         is_found_image = self.checkImageExisting(
-            'ImageErrorCase/SettingInstalledMaterial-Cut.png')  # เปลี่ยนรูปด้วย
-        if not is_found_image:
+            'ImageErrorCase/SettingInstalledMaterial-Cut.png',timeout=10)  # เปลี่ยนรูปด้วย
+        if is_found_image:
             self.emulateFunction('ImageRecognition/5-Print.PNG')
             is_found_image = self.checkImageExisting(
                 'ImageErrorCase/PrinterBusy-Cut.png')
