@@ -428,16 +428,16 @@ class Ui(QMainWindow):
             'ImageErrorCase/FileError-Cut.png')  # เปลี่ยนรูปด้วย
         if not is_found_image:
             self.checkImageExisting_2('ImageErrorCase/OkFileError-Cut.PNG',click=True)
-            self.checkImageExisting_2('ImageRecognition/1-Close-Login.PNG',click=True)
-            self.checkImageExisting_2('ImageRecognition/2-Import-file.PNG',click=True)
-            self.checkImageExisting_2('ImageRecognition/3-Open-file.PNG',click=True)
+            self.checkImageExisting_2('ImageRecognition/1-Close-Login.PNG',click=True,timeout=3)
+            self.checkImageExisting_2('ImageRecognition/2-Import-file.PNG',click=True,timeout=3)
+            self.checkImageExisting_2('ImageRecognition/3-Open-file.PNG',click=True,timeout=3)
             is_found_image = self.checkImageExisting(
                 'ImageErrorCase/CannotRenderFile-Cut.png')  # เปลี่ยนรูปด้วย
             # if not is_found_image:
             #     os.system('shutdown /r /t 0')
 
         self.worker.s.sendall(b'st:0:st')
-        # time.sleep(10)
+        time.sleep(5)
         self.checkImageExisting_2('ImageRecognition/5-Print.PNG',click=True)
 
         is_handle_error = False
