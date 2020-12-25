@@ -422,15 +422,15 @@ class Ui(QMainWindow):
         is_found_image = self.checkImageExisting(
             'ImageErrorCase/ObjectSmall-Cut.png')  # เปลี่ยนรูปด้วย
         if not is_found_image:
-            self.emulateFunction('ImageRecognition/4-1-No.PNG')
+            self.checkImageExisting_2('ImageRecognition/4-1-No.PNG')
 
         is_found_image = self.checkImageExisting(
             'ImageErrorCase/FileError-Cut.png')  # เปลี่ยนรูปด้วย
         if not is_found_image:
-            self.emulateFunction('ImageErrorCase/OkFileError-Cut.PNG')
-            self.emulateFunction('ImageRecognition/1-Close-Login.PNG')
-            self.emulateFunction('ImageRecognition/2-Import-file.PNG')
-            self.emulateFunction('ImageRecognition/3-Open-file.PNG')
+            self.checkImageExisting_2('ImageErrorCase/OkFileError-Cut.PNG')
+            self.checkImageExisting_2('ImageRecognition/1-Close-Login.PNG')
+            self.checkImageExisting_2('ImageRecognition/2-Import-file.PNG')
+            self.checkImageExisting_2('ImageRecognition/3-Open-file.PNG')
             is_found_image = self.checkImageExisting(
                 'ImageErrorCase/CannotRenderFile-Cut.png')  # เปลี่ยนรูปด้วย
             # if not is_found_image:
