@@ -448,7 +448,9 @@ class Ui(QMainWindow):
             is_found_image = self.checkImageExisting(
                 'ImageErrorCase/PrinterBusy-Cut.png')
             if is_found_image:
-                self.checkImageExisting_2('ImageRecognition/5-1-Print.PNG',click=True)
+                is_found_image = self.checkImageExisting_2('ImageRecognition/5-1-Print.PNG',click=True)
+                if not is_found_image:
+                    self.checkImageExisting_2('ImageRecognition/5-Print.PNG',click=True)
             is_handle_error = True
 
         if not is_handle_error:
