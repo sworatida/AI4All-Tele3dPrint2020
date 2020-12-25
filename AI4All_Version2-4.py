@@ -445,20 +445,31 @@ class Ui(QMainWindow):
         # time.sleep(10)
         self.emulateFunction('ImageRecognition/5-Print.PNG')
 
+
+        is_handle_error = False
         is_found_image = self.checkImageExisting(
             'ImageErrorCase/SettingInstalledMaterial-Cut.png')  # เปลี่ยนรูปด้วย
         if not is_found_image:
             self.emulateFunction('ImageRecognition/5-Print.PNG')
+            is_found_image = self.checkImageExisting(
+                'ImageErrorCase/PrinterBusy-Cut.png')
+            if is_found_image:
+                self.emulateFunction('ImageRecognition/5-Print.PNG')
+            is_handle_error = True
 
-        is_found_image = self.checkImageExisting(
-            'ImageErrorCase/NoPrinter-Cut.png')  # เปลี่ยนรูปด้วย
-        if not is_found_image:
-            os.system('shutdown /r /t 0')
+        if not is_handle_error:
+            is_found_image = self.checkImageExisting(
+                'ImageErrorCase/NoPrinter-Cut.png')  # เปลี่ยนรูปด้วย
+            if not is_found_image:
+                os.system('shutdown /r /t 0')
+            is_handle_error = True
 
-        is_found_image = self.checkImageExisting(
-            'ImageErrorCase/PrinterBusy-Cut.png')  # เปลี่ยนรูปด้วย
-        if not is_found_image:
-            os.system('shutdown /r /t 0')
+        if not is_handle_error:
+            is_found_image = self.checkImageExisting(
+                'ImageErrorCase/PrinterBusy-Cut.png')  # เปลี่ยนรูปด้วย
+            if not is_found_image:
+                os.system('shutdown /r /t 0')
+            is_handle_error = True
 
     def startButtonPressed(self, is_worker_handle=False, save_path='', is_first_time=True):
         # This is executed when the button is pressed
